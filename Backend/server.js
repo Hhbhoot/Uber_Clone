@@ -1,7 +1,27 @@
 import dotenv from "dotenv";
 dotenv.config();
 import app from "./app.js";
+import http from "http";
 import mongoose from "mongoose";
+import os from "os";
+
+function getIpAddress() {
+  const networkInterfaces = os.networkInterfaces();
+
+  for (let interfacesName in networkInterfaces) {
+    let interFaces = networkInterfaces[interfacesName];
+    for (let int of interFaces) {
+      if (int.family === "IPv4" && !int.internal) {
+        return int.address;
+      }
+    }
+  }
+  return "127.0.0.1";
+}
+
+getIpAddress();
+
+const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
 
@@ -14,15 +34,11 @@ async function connectDB() {
   }
 }
 
-const server = async () => {
+server.listen(PORT, async () => {
+  console.log(`Server is running at http://${getIpAddress()}:${PORT}`);
   try {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
     await connectDB();
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.error(err);
   }
-};
-
-server();
+});
