@@ -1,6 +1,12 @@
 import express from "express";
 import { body } from "express-validator";
-import { RegisterUser } from "../Controllers/user.controller.js";
+import {
+  loginUser,
+  RegisterUser,
+  updateUser,
+} from "../Controllers/user.controller.js";
+import upload from "../utils/multer.js";
+import { userAuthMiddleware } from "../middleware/userAuth.js";
 
 const router = express.Router();
 
@@ -13,8 +19,21 @@ router
         .withMessage("First name shoud be minimum 3 characters long"),
       body("email").isEmail().withMessage("Invalid Email"),
       body("password")
-        .isLength({ min: 3 })
+        .isLength({ min: 8 })
         .withMessage("Password must be at least 8 characters long"),
     ],
     RegisterUser
   );
+
+router
+  .route("/login")
+  .post(
+    [body("email").isEmail().withMessage("Invalid Email"), body("password")],
+    loginUser
+  );
+
+router
+  .route("/update")
+  .post(userAuthMiddleware, upload.single("profile"), updateUser);
+
+export default router;

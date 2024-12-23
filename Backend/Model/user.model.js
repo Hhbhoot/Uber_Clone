@@ -44,15 +44,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.methods.hashPassword = async (password) => {
+userSchema.statics.hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
 
-userSchema.methods.comparePassword = async (password) => {
+userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateToken = () => {
+userSchema.methods.generateToken = function () {
   const token = jwt.sign(
     {
       id: this._id,
@@ -67,6 +67,6 @@ userSchema.methods.generateToken = () => {
   return token;
 };
 
-const User = mongoose.model("model", userSchema);
+const User = mongoose.model("user", userSchema);
 
 export default User;

@@ -13,7 +13,7 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   })
 );
@@ -21,8 +21,12 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+import userRouter from "./Routes/user.routes.js";
+
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
+
+app.use("/api/v1/user", userRouter);
 
 export default app;
