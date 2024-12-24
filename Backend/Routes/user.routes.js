@@ -2,8 +2,10 @@ import express from "express";
 import { body } from "express-validator";
 import {
   loginUser,
+  logOut,
   RegisterUser,
   updateUser,
+  userProfile,
 } from "../Controllers/user.controller.js";
 import upload from "../utils/multer.js";
 import { userAuthMiddleware } from "../middleware/userAuth.js";
@@ -35,5 +37,9 @@ router
 router
   .route("/update")
   .post(userAuthMiddleware, upload.single("profile"), updateUser);
+
+router.route("/profile").get(userAuthMiddleware, userProfile);
+
+router.route("/logout").get(userAuthMiddleware, logOut);
 
 export default router;

@@ -1,6 +1,7 @@
 import User from "../Model/user.model.js";
 import { validationResult } from "express-validator";
 import { registerUser, UpdateUser } from "../Services/user.services.js";
+import BlackListedTokenModel from "../Model/blacklistedToken.model.js";
 
 export const RegisterUser = async (req, res) => {
   try {
@@ -101,12 +102,13 @@ export const updateUser = async (req, res, next) => {
 
     const id = req?.user?._id;
 
+    let profile;
     if (req?.file) {
-      const { filename } = req.file;
-      req.profile = filename.replace(/\\/g, "/");
+      const { path } = req.file;
+      profile = path.replace(/\\/g, "/");
     }
 
-    const updatedUser = await UpdateUser(id, { ...req?.body });
+    const updatedUser = await UpdateUser(id, { ...req?.body, profile });
 
     if (!updatedUser) {
       return res
@@ -116,6 +118,7 @@ export const updateUser = async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
+      message: "User updated successfully",
       data: {
         updatedUser,
       },
@@ -123,4 +126,26 @@ export const updateUser = async (req, res, next) => {
   } catch (err) {
     res.status(400).json({ status: "error", message: err.message });
   }
+};
+
+export const userProfile = async (req, res, next) => {
+  const user = req?.user;
+  res.status(200).json({
+    status: "success",
+    message: "User pofile fetched successfully",
+    data: {
+      user,
+    },
+  });
+};
+
+export const logOut = async (req, res, next) => {
+  const token = req?.headers.authorization?.split(" ")[1];
+
+  await BlackListedTokenModel.create({ token });
+
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully",
+  });
 };

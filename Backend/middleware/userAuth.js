@@ -1,20 +1,30 @@
 import jwt from "jsonwebtoken";
 import User from "../Model/user.model.js";
+import BlackListedTokenModel from "../Model/blacklistedToken.model.js";
 
 export const userAuthMiddleware = async (req, res, next) => {
   try {
     let token;
 
-    if (req.header["Authorization"]?.incudes("Bearer")) {
-      token = req.header["Authorization"].replace("Bearer ", "");
+    if (req.headers.authorization?.includes("Bearer")) {
+      token = req.headers.authorization.replace("Bearer ", "");
     } else {
-      token = req?.header["Authorization"];
+      token = req?.headers.authorization;
     }
 
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Access denied. No token provided." });
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized",
+      });
+    }
+
+    const isBlackListed = await BlackListedTokenModel.findOne({ token });
+    if (isBlackListed) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized",
+      });
     }
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
