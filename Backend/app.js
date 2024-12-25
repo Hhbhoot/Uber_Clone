@@ -7,6 +7,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const filepath = path.resolve(__dirname, "public", "uploads");
 import path from "path";
+import userRouter from "./Routes/user.routes.js";
+import captainRouter from "./Routes/captain.routes.js";
 
 const app = express();
 
@@ -26,8 +28,6 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import userRouter from "./Routes/user.routes.js";
-
 app.use("/public/uploads", express.static(filepath));
 
 app.get("/api", (req, res, next) => {
@@ -36,9 +36,13 @@ app.get("/api", (req, res, next) => {
 });
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/captain", captainRouter);
 
 app.use("*", (req, res, next) => {
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({
+    status: "fail",
+    message: `can't find route ${req?.originalUrl} on this server..`,
+  });
 });
 
 export default app;
