@@ -1,10 +1,13 @@
 import express from "express";
 import { body } from "express-validator";
 import {
+  CaptainProfile,
   LoginCaptain,
+  LogoutCaptain,
   RegisterCaptain,
 } from "../Controllers/captain.controller.js";
 import upload from "../utils/multer.js";
+import captainAuth from "../middleware/captainAuth.js";
 
 const Router = express.Router();
 
@@ -48,5 +51,9 @@ Router.route("/login").post(
   ],
   LoginCaptain
 );
+
+Router.route("/profile").get(captainAuth, CaptainProfile);
+
+Router.route("/logout").get(captainAuth, LogoutCaptain);
 
 export default Router;

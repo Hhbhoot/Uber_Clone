@@ -13,8 +13,6 @@ export const RegisterUser = async (req, res) => {
 
     const { fullName, email, password, gender } = req?.body;
 
-    console.log(req?.body);
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({

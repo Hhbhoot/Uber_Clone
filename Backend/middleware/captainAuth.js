@@ -24,7 +24,7 @@ const captainAuth = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    const captain = await CaptainModel.findOne({ _id: decoded._id });
+    const captain = await CaptainModel.findOne({ _id: decoded.id });
     if (!captain) {
       return res.status(401).json({
         status: "fail",

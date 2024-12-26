@@ -1,6 +1,7 @@
 import CaptainModel from "../Model/captain.model.js";
 import { validationResult } from "express-validator";
 import { RegisterCaptainService } from "../Services/captain.services.js";
+import BlackListedTokenModel from "../Model/blacklistedToken.model.js";
 
 export const RegisterCaptain = async (req, res, next) => {
   try {
@@ -121,5 +122,40 @@ export const LoginCaptain = async (req, res, next) => {
       status: "fail",
       error: error?.message || "Internal Server Error",
     });
+  }
+};
+
+export const CaptainProfile = async (req, res, next) => {
+  try {
+    const captain = await CaptainModel.findById(req?.captain?._id);
+    return res.status(200).json({
+      status: "success",
+      message: "Captain profile fetched successfully",
+      data: {
+        captain,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      error: error?.message || "Internal Server Error",
+    });
+  }
+};
+
+export const LogoutCaptain = async (req, res, next) => {
+  try {
+    const token =
+      req.headers.authorization.replace("Bearer ", "") ||
+      req.headers.authorization;
+
+    await BlackListedTokenModel.create({ token });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Logged out Successfully",
+    });
+  } catch (err) {
+    return res.status(401).json({ status: "fail", error: "Unauthorized" });
   }
 };
