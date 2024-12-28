@@ -16,7 +16,7 @@ export const RegisterCaptain = async (req, res, next) => {
     const { fullName, email, password, vehicle, gender } = req?.body;
     // console.log(req?.body);
 
-    if (!fullName || !email || !password || !vehicle || !gender) {
+    if (!fullName || !email || !password || !vehicle) {
       return res.status(400).json({
         status: "fail",
         error: "Please provide all required fields",

@@ -9,9 +9,18 @@ http.interceptors.request.use((config) => {
   // Do something before request is sent
 
   let token = localStorage.getItem("authToken") || null;
-  req.headers.authorization = `Bearer ${token}`;
+  config.headers.authorization = `Bearer ${token}`;
   return config;
 });
 
 export const userLogin = async (data, params, headers) =>
   http.post("/api/v1/user/login", data, { params, headers });
+
+export const userSignup = async (data, params, headers) =>
+  http.post("/api/v1/user/register", data, { params, headers });
+
+export const captainLogin = async (data, params, headers) =>
+  http.post("/api/v1/captain/login", data, { params, headers });
+
+export const captainSignup = async (data, params, headers) =>
+  http.post("/api/v1/captain/register", data, { params, headers });

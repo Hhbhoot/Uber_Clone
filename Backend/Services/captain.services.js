@@ -7,9 +7,8 @@ export const RegisterCaptainService = async ({
   vehicle,
   gender,
 }) => {
-  console.log(fullName, email, password, vehicle, gender);
   try {
-    if (!fullName || !email || !password || !vehicle || !gender) {
+    if (!fullName || !email || !password || !vehicle) {
       throw new Error("Please fill in all fields");
     }
 

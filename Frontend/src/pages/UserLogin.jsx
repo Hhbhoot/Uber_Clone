@@ -26,17 +26,26 @@ const UserLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(email, password);
+
     const toastId = toast.loading("logging in...");
     setLoading(true);
     try {
       const { data } = await userLogin({ email, password });
-
+      console.log(data);
       if (data?.status !== "success") {
-        toast.error("Invalid email or password", { id: toastId });
+        toast.error("Invalid email or password");
       }
 
+      setEmail("");
+      setPassword("");
       toast.success("Logged in successfully!", { id: toastId });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      toast.error("Invalid email or password", { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,8 +58,11 @@ const UserLogin = () => {
             alt="uber-logo"
           />
           <form onSubmit={handleSubmit} className="flex flex-col gap-y-2">
-            <div className="flex flex-col py-2">
-              <label htmlFor="email" className="text-xl font-medium">
+            <div className="flex flex-col py-1">
+              <label
+                htmlFor="email"
+                className="text-base md:text-xl font-medium"
+              >
                 What's Your Email
               </label>
               <input
@@ -60,11 +72,20 @@ const UserLogin = () => {
                 value={email}
                 placeholder="example@gmail.com"
                 onChange={handleInputChange}
-                className="w-full shadow-md mt-3 bg-[#eee] rounded-md px-4 py-2  focus:outline-none"
+                className="w-full shadow-md mt-2 bg-[#eee] rounded-md px-4 py-2  focus:outline-none"
               />
+
+              {/* {
+                <div className="text-red-500 h-4 py-1 px-2 text-sm">
+                  {error?.email}
+                </div>
+              } */}
             </div>
-            <div className="flex flex-col py-2">
-              <label htmlFor="password" className="text-xl font-medium">
+            <div className="flex flex-col py-1">
+              <label
+                htmlFor="password"
+                className="text-base md:text-xl font-medium"
+              >
                 Enter Your Password
               </label>
               <input
@@ -74,15 +95,31 @@ const UserLogin = () => {
                 value={password}
                 placeholder="Password"
                 onChange={handleInputChange}
-                className="w-full shadow-md mt-3 bg-[#eee] rounded-md px-4 py-2 focus:outline-none"
+                className="w-full shadow-md mt-2 bg-[#eee] rounded-md px-4 py-2 focus:outline-none"
               />
+              {/* {
+                <div className="text-red-500 h-4 py-1 px-2 text-sm">
+                  {error?.password}
+                </div>
+              } */}
             </div>
             <button
+              disabled={loading}
               type="submit"
               className="w-full mt-4 bg-black  text-white py-2 text-xl font-semibold rounded-md"
             >
               Login
             </button>
+
+            <p className="px-4 text-center mt-2">
+              New here ?{" "}
+              <Link
+                to="/user-signup"
+                className="hover:underline hover:underline-offset-2 text-blue-600"
+              >
+                Create New Account
+              </Link>
+            </p>
           </form>
 
           <div className="flex items-center justify-center mt-10">
