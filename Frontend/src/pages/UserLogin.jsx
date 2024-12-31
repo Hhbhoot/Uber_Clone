@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userLogin } from "../apis";
+import useUserAuthConext from "../context/userAuthContext";
 
 const UserLogin = () => {
+  const navigate = useNavigate();
+  const { setUser, setIsAuth } = useUserAuthConext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState({
@@ -26,8 +29,6 @@ const UserLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(email, password);
-
     const toastId = toast.loading("logging in...");
     setLoading(true);
     try {
@@ -37,9 +38,17 @@ const UserLogin = () => {
         toast.error("Invalid email or password");
       }
 
+      setIsAuth(true);
+      setUser(data?.data?.user);
+      localStorage.setItem("authToken", data?.data?.token);
+
       setEmail("");
       setPassword("");
       toast.success("Logged in successfully!", { id: toastId });
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 200);
     } catch (error) {
       console.log(error);
       toast.error("Invalid email or password", { id: toastId });

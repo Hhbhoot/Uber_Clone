@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { userSignup } from "../apis";
+import useUserAuthConext from "../context/userAuthContext";
 
 const UserSignup = () => {
+  const navigate = useNavigate();
+  const { setUser, setIsAuth } = useUserAuthConext();
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -59,15 +62,25 @@ const UserSignup = () => {
         id: toastId,
       });
 
+      setIsAuth(true);
+      setUser(data?.data?.user);
+      localStorage.setItem("authToken", data?.data?.token);
+
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 200);
     } catch (err) {
       console.error(err);
       toast.error("Failed to sign up...", {
         id: toastId,
       });
+    } finally {
+      setLoading(false);
     }
   };
 

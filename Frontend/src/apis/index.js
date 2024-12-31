@@ -19,8 +19,14 @@ export const userLogin = async (data, params, headers) =>
 export const userSignup = async (data, params, headers) =>
   http.post("/api/v1/user/register", data, { params, headers });
 
+export const userTokenCheck = async (params, headers) =>
+  http.get("/api/v1/user/profile", { params, headers });
+
 export const captainLogin = async (data, params, headers) =>
   http.post("/api/v1/captain/login", data, { params, headers });
 
 export const captainSignup = async (data, params, headers) =>
   http.post("/api/v1/captain/register", data, { params, headers });
+
+export const captainTokenCheck = async (params, headers) =>
+  http.get("/api/v1/captain/profile", { params, headers });
