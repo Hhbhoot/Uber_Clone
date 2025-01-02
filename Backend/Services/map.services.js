@@ -1,12 +1,14 @@
 import axios from "axios";
-const apiKey = process.env.GOOGLE_API_KEY;
 
 export async function getLatLongFromAddress(address) {
+  const apiKey = process.env.GOOGLE_API_KEY;
   try {
     // Construct the Google Maps Geocoding API URL
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
       address
     )}&key=${apiKey}`;
+
+    console.log(url);
 
     // Make the API request
     const response = await axios.get(url);
@@ -28,32 +30,52 @@ export async function getLatLongFromAddress(address) {
 }
 
 export async function getDistanceAndTimeService(pickup, destination) {
-  const baseUrl = "https://maps.googleapis.com/maps/api/distancematrix/json";
-  const params = {
-    origins: `${pickup.lat},${pickup.long}`,
-    destinations: `${destination.lat},${destination.long}`,
-    key: apiKey,
-  };
+  if (!pickup || !destination) {
+    throw new Error("Origin and destination are required");
+  }
+  const apiKey = process.env.GOOGLE_API_KEY;
+
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(
+    pickup
+  )}&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
 
   try {
-    const response = await axios.get(baseUrl, { params });
-    const data = response.data;
-
-    if (data.status === "OK") {
-      const element = data.rows[0].elements[0];
-      if (element.status === "OK") {
-        return {
-          distance: element.distance.text, // e.g., "15 km"
-          duration: element.duration.text, // e.g., "20 mins"
-        };
-      } else {
-        throw new Error(`Error with element status: ${element.status}`);
+    const response = await axios.get(url);
+    if (response.data.status === "OK") {
+      if (response.data.rows[0].elements[0].status === "ZERO_RESULTS") {
+        throw new Error("No routes found");
       }
+
+      return response.data.rows[0].elements[0];
     } else {
-      throw new Error(`Error with API status: ${data.status}`);
+      throw new Error("Unable to fetch distance and time");
     }
-  } catch (error) {
-    console.error("Error fetching distance and time:", error.message);
-    throw error;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+export async function getSuggestionsService(address) {
+  if (!address) {
+    throw new Error("Address is required");
+  }
+
+  const apiKey = process.env.GOOGLE_API_KEY;
+
+  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+    address
+  )}&key=${apiKey}`;
+
+  try {
+    const response = await axios.get(url);
+    if (response.data.status === "OK") {
+      return response.data.predictions;
+    } else {
+      throw new Error("Unable to fetch suggestions");
+    }
+  } catch (err) {
+    console.error(err);
+    throw err;
   }
 }
