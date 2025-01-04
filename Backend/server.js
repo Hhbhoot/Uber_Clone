@@ -4,6 +4,7 @@ import app from "./app.js";
 import http from "http";
 import mongoose from "mongoose";
 import os from "os";
+import InitializeSocket from "./socket.js";
 
 function getIpAddress() {
   const networkInterfaces = os.networkInterfaces();
@@ -22,6 +23,8 @@ function getIpAddress() {
 getIpAddress();
 
 const server = http.createServer(app);
+
+InitializeSocket(server);
 
 const PORT = process.env.PORT || 5000;
 

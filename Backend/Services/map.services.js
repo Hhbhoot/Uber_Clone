@@ -79,3 +79,28 @@ export async function getSuggestionsService(address) {
     throw err;
   }
 }
+
+export async function getFareDetailsService(distance, vehicleType) {
+  if (!distance || !vehicleType) {
+    throw new Error("Distance and duration are required");
+  }
+
+  const perKmCharge = {
+    car: 10,
+    auto: 8,
+    motorcycle: 6,
+  };
+
+  const fare = (type, distance) => {
+    const distanceInKm = distance / 1000;
+    return (distanceInKm * perKmCharge[type] || 0).toFixed(2);
+  };
+
+  const fares = {
+    Car: fare("car", distance),
+    Auto: fare("auto", distance),
+    Motorcycle: fare("motorcycle", distance),
+  };
+
+  return fares[vehicleType];
+}
