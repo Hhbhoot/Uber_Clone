@@ -1,8 +1,10 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import SearchLocationSuggestion from "../components/SearchLocationSuggestion";
+import { getSuggestions } from "../apis";
+import { FaUser } from "react-icons/fa";
 
 const Home = () => {
   const [pickup, setpickup] = useState("");
@@ -10,6 +12,26 @@ const Home = () => {
   const [panelOpen, setpanelOpen] = useState(false);
   const panelRef = useRef(null);
   const closePanelRef = useRef(null);
+
+  const [suggestions, setsuggestions] = useState([]);
+
+  const getPlaceSuggestions = async (input) => {
+    try {
+      const { data } = await getSuggestions(input);
+      setsuggestions(data?.data?.suggestions);
+    } catch (err) {
+      setsuggestions([]);
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    getPlaceSuggestions(pickup);
+  }, [pickup]);
+
+  useEffect(() => {
+    getPlaceSuggestions(destination);
+  }, [destination]);
 
   const handleChange = (e) => {
     if (e.target.name === "pickup") {
@@ -50,7 +72,7 @@ const Home = () => {
   );
 
   return (
-    <div className="h-screen w-full relative">
+    <div className="h-screen w-full relative ">
       <img
         src="/img/blackLogo.png"
         className="absolute w-32 h-20"
@@ -69,7 +91,10 @@ const Home = () => {
           <div
             className="absolute right-6 top-6"
             ref={closePanelRef}
-            onClick={() => setpanelOpen(!panelOpen)}
+            onClick={() => {
+              setpanelOpen(!panelOpen);
+              setsuggestions([]);
+            }}
           >
             <MdOutlineKeyboardArrowDown className="text-2xl" />
           </div>
@@ -108,7 +133,62 @@ const Home = () => {
           </form>
         </div>
         <div ref={panelRef} className="h-0 w-full bg-white">
-          <SearchLocationSuggestion />
+          <SearchLocationSuggestion
+            suggestions={suggestions}
+            setpickup={setpickup}
+            setdestination={setdestination}
+          />
+        </div>
+      </div>
+
+      <div className="fixed bottom-0 z-10 w-full h-[30%]  bg-[#fff] rounded-t-3xl ">
+        <div className="flex flex-col items-start gap-y-4 p-3">
+          <h4 className="text-2xl text-start font-medium mt-3">
+            Choose a Vehicle
+          </h4>
+
+          <div className="flex items-start justify-between mt-4 gap-x-3 w-full border border-gray-400 p-3 rounded-xl active:border-black">
+            <img src="/img/car.webp" className="w-16 mt-3" alt="car" />
+            <div className="flex flex-col gap-y-[2px] text-sm w-[50%]">
+              <p className="font-bold flex items-center gap-2">
+                UberGo{" "}
+                <span className="flex items-center gap-1">
+                  <FaUser text="sm" /> 4
+                </span>
+              </p>
+              <p className="text-normal">2 Mins Away</p>
+              <p className="text-nowrap">Affordable , Compact Rides</p>
+            </div>
+            <p className="text-nowrap font-medium">Rs. 150</p>
+          </div>
+          <div className="flex items-start justify-between mt-4 gap-x-3 w-full border border-gray-400 p-3 rounded-xl">
+            <img src="/img/auto.webp" className="w-16 mt-3" alt="car" />
+            <div className="flex flex-col gap-y-[2px] text-sm w-[50%]">
+              <p className="font-bold flex items-center gap-2">
+                UberGo{" "}
+                <span className="flex items-center gap-1">
+                  <FaUser text="sm" /> 4
+                </span>
+              </p>
+              <p className="text-normal">2 Mins Away</p>
+              <p className="text-nowrap">Affordable , Compact Rides</p>
+            </div>
+            <p className="text-nowrap font-medium">Rs. 150</p>
+          </div>
+          <div className="flex items-start justify-between mt-4 gap-x-3 w-full border border-gray-400 p-3 rounded-xl">
+            <img src="/img/moto.webp" className="w-16 mt-3" alt="car" />
+            <div className="flex flex-col gap-y-[2px] text-sm w-[50%]">
+              <p className="font-bold flex items-center gap-2">
+                UberGo{" "}
+                <span className="flex items-center gap-1">
+                  <FaUser text="sm" /> 4
+                </span>
+              </p>
+              <p className="text-normal">2 Mins Away</p>
+              <p className="text-nowrap">Affordable , Compact Rides</p>
+            </div>
+            <p className="text-nowrap font-medium">Rs. 150</p>
+          </div>
         </div>
       </div>
     </div>

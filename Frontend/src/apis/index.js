@@ -30,3 +30,9 @@ export const captainSignup = async (data, params, headers) =>
 
 export const captainTokenCheck = async (params, headers) =>
   http.get("/api/v1/captain/profile", { params, headers });
+
+export const getSuggestions = async (input, params, headers) =>
+  http.get(`/api/v1/maps/get-suggestions?address=${input}`, {
+    params,
+    headers,
+  });
