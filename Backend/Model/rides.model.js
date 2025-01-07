@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const ridesSchema = new mongoose.Schema(
   {
@@ -66,12 +67,21 @@ const ridesSchema = new mongoose.Schema(
       enum: ["Paid", "Pending"],
       default: "Pending",
     },
+
+    otp: {
+      type: String,
+    },
   },
 
   {
     timestamps: true,
   }
 );
+
+ridesSchema.statics.generatOTP = function () {
+  const otp = crypto.randomInt(100000, 1000000); // Generates a number between 100000 and 999999
+  return otp;
+};
 
 const RidesModel = mongoose.model("rides", ridesSchema);
 

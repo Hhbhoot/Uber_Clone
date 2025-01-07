@@ -4,6 +4,7 @@ import {
   getFareDetailsService,
 } from "../Services/map.services.js";
 import { createRideService } from "../Services/ride.services.js";
+import RidesModel from "../Model/rides.model.js";
 
 export const createRides = async (req, res, next) => {
   const errors = validationResult(req);
@@ -46,6 +47,8 @@ export const createRides = async (req, res, next) => {
     });
   }
 
+  const otp = await RidesModel.generatOTP();
+
   const newRide = await createRideService({
     user: req?.user?._id,
     pickup,
@@ -54,6 +57,7 @@ export const createRides = async (req, res, next) => {
     duration: duration.value,
     fare: calculateFare,
     vehicleType,
+    otp,
   });
 
   if (!newRide) {

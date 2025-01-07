@@ -8,8 +8,17 @@ export const createRideService = async ({
   duration,
   fare,
   vehicleType,
+  otp,
 }) => {
-  if (!user || !pickup || !destination || !distance || !duration || !fare) {
+  if (
+    !user ||
+    !pickup ||
+    !destination ||
+    !distance ||
+    !duration ||
+    !fare ||
+    !otp
+  ) {
     throw new Error("Missing required fields");
   }
 
@@ -21,6 +30,7 @@ export const createRideService = async ({
     duration,
     fare,
     vehicleType,
+    otp,
   });
   return newRide;
 };

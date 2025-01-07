@@ -9,6 +9,7 @@ const ChooseVehiclePanel = (props) => {
       <div
         className="flex items-start justify-between mt-4 gap-x-3 w-full border border-gray-400 p-3 rounded-xl active:border-black"
         onClick={(e) => {
+          props.setVehicleType("Car");
           props.setvehicleDetailsOpen(true);
           props.setvehiclePanelOpen(false);
         }}
@@ -24,12 +25,13 @@ const ChooseVehiclePanel = (props) => {
           <p className="text-normal">2 Mins Away</p>
           <p className="text-nowrap">Affordable , Compact Rides</p>
         </div>
-        <p className="text-nowrap font-medium">Rs. 150</p>
+        <p className="text-nowrap font-medium">₹{props.fare.Car || 0}</p>
       </div>
 
       <div
         className="flex items-start justify-between mt-4 gap-x-3 w-full border border-gray-400 p-3 rounded-xl"
         onClick={(e) => {
+          props.setVehicleType("Auto");
           props.setvehicleDetailsOpen(true);
           props.setvehiclePanelOpen(false);
         }}
@@ -45,7 +47,7 @@ const ChooseVehiclePanel = (props) => {
           <p className="text-normal">2 Mins Away</p>
           <p className="text-nowrap">Affordable , Compact Rides</p>
         </div>
-        <p className="text-nowrap font-medium">Rs. 150</p>
+        <p className="text-nowrap font-medium">₹{props.fare?.Auto || 0}</p>
       </div>
 
       <div
@@ -53,6 +55,7 @@ const ChooseVehiclePanel = (props) => {
         onClick={(e) => {
           props.setvehicleDetailsOpen(true);
           props.setvehiclePanelOpen(false);
+          props.setVehicleType("Motorcycle");
         }}
       >
         <img src="/img/moto.webp" className="w-16 mt-3" alt="car" />
@@ -66,7 +69,7 @@ const ChooseVehiclePanel = (props) => {
           <p className="text-normal">2 Mins Away</p>
           <p className="text-nowrap">Affordable , Compact Rides</p>
         </div>
-        <p className="text-nowrap font-medium">Rs. 150</p>
+        <p className="text-nowrap font-medium">₹{props.fare.Motorcycle || 0}</p>
       </div>
     </div>
   );

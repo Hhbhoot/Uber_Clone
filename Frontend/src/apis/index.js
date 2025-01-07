@@ -36,3 +36,6 @@ export const getSuggestions = async (input, params, headers) =>
     params,
     headers,
   });
+
+export const getFareDetails = async (data, params, headers) =>
+  http.post("/api/v1/maps/get-fare-details", data, { params, headers });

@@ -3,7 +3,7 @@ import gsap from "gsap";
 import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import SearchLocationSuggestion from "../components/SearchLocationSuggestion";
-import { getSuggestions } from "../apis";
+import { getFareDetails, getSuggestions } from "../apis";
 import toast from "react-hot-toast";
 import ChooseVehiclePanel from "../components/ChooseVehiclePanel";
 import VehicleDetailsPage from "../components/VehicleDetailsPage";
@@ -29,6 +29,39 @@ const Home = () => {
 
   const [lookingForDriver, setLookingForDriver] = useState(false);
   const lookingForDriverRef = useRef(null);
+
+  const [fare, setFare] = useState({});
+  const [distance, setDistance] = useState("");
+
+  const [vehicleType, setVehicleType] = useState("");
+
+  const getTimeAndDistance = async () => {
+    if (!pickup || !destination) {
+      toast.error("Please enter pickup and destination");
+    }
+
+    if (pickup === destination) {
+      toast.error("Pickup and destination cannot be the same");
+    }
+
+    const dataToSend = {
+      pickup,
+      destination,
+    };
+
+    try {
+      const { data } = await getFareDetails(dataToSend);
+
+      if (data?.status !== "success") {
+        throw new Error(data?.message);
+      }
+
+      setFare(data?.data?.fares);
+      setDistance(data?.data?.distance);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getPlaceSuggestions = async (input) => {
     if (isSelecting) {
@@ -94,6 +127,8 @@ const Home = () => {
     }
     setpanelOpen(false);
     setvehiclePanelOpen(true);
+
+    getTimeAndDistance();
   };
 
   useGSAP(
@@ -257,6 +292,9 @@ const Home = () => {
         <ChooseVehiclePanel
           setvehiclePanelOpen={setvehiclePanelOpen}
           setvehicleDetailsOpen={setvehicleDetailsOpen}
+          fare={fare}
+          distance={distance}
+          setVehicleType={setVehicleType}
         />
       </div>
 
@@ -267,6 +305,10 @@ const Home = () => {
         <VehicleDetailsPage
           setvehicleDetailsOpen={setvehicleDetailsOpen}
           setLookingForDriver={setLookingForDriver}
+          pickup={pickup}
+          destination={destination}
+          fare={fare}
+          vehicleType={vehicleType}
         />
       </div>
 
@@ -274,7 +316,12 @@ const Home = () => {
         ref={lookingForDriverRef}
         className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
       >
-        <LookingForDriver />
+        <LookingForDriver
+          vehicleType={vehicleType}
+          pickup={pickup}
+          destination={destination}
+          fare={fare}
+        />
       </div>
     </div>
   );

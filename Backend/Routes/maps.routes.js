@@ -3,6 +3,7 @@ import { userAuthMiddleware } from "../middleware/userAuth.js";
 import { body, query } from "express-validator";
 import {
   getCoordinatesFromAddress,
+  getFareDetails,
   getSuggestions,
   getTimeAndDistanceBetweenTwoPoints,
 } from "../Controllers/map.controller.js";
@@ -45,6 +46,19 @@ Router.route("/get-time-and-distance").post(
       .withMessage("Please enter valid destination location"),
   ],
   getTimeAndDistanceBetweenTwoPoints
+);
+
+Router.route("/get-fare-details").post(
+  userAuthMiddleware,
+  [
+    body("pickup")
+      .isLength({ min: 3 })
+      .withMessage("Please entervalid pickup location"),
+    body("destination")
+      .isLength({ min: 3 })
+      .withMessage("Please enter valid destination location"),
+  ],
+  getFareDetails
 );
 
 Router.route("/get-suggestions").get(
