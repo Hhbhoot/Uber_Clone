@@ -30,6 +30,8 @@ export const captainSignup = async (data, params, headers) =>
 
 export const captainTokenCheck = async (params, headers) =>
   http.get("/api/v1/captain/profile", { params, headers });
+export const updateDrivingStatus = async (params, headers) =>
+  http.patch("/api/v1/captain/update-status", { params, headers });
 
 export const getSuggestions = async (input, params, headers) =>
   http.get(`/api/v1/maps/get-suggestions?address=${input}`, {
@@ -39,3 +41,6 @@ export const getSuggestions = async (input, params, headers) =>
 
 export const getFareDetails = async (data, params, headers) =>
   http.post("/api/v1/maps/get-fare-details", data, { params, headers });
+
+export const captainLogut = async (params, headers) =>
+  http.get("/api/v1/captain/logout", { params, headers });

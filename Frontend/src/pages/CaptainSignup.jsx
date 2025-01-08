@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { captainSignup } from "../apis";
+import useCaptainAuthContext from "../context/captainAuthContext";
 
 const CaptainSignup = () => {
+  const { setIsAuth, setCaptain } = useCaptainAuthContext();
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -17,6 +19,7 @@ const CaptainSignup = () => {
     type: "",
   });
 
+  const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState(null);
 
   const handleChange = (selectedOption) => {
@@ -92,6 +95,14 @@ const CaptainSignup = () => {
       });
       setFirstName("");
       setLastName("");
+
+      setIsAuth(true);
+      setCaptain(data?.data?.captain);
+      localStorage.setItem("authToken", data?.data?.token);
+
+      setTimeout(() => {
+        navigate("/captain-home");
+      }, 200);
     } catch (err) {
       console.error(err);
       toast.error("Error signing up captain!", {

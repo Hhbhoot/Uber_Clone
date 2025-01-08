@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { captainLogin } from "../apis";
+import useCaptainAuthContext from "../context/captainAuthContext";
 
 const CaptainLogin = () => {
+  const { setIsAuth, setCaptain } = useCaptainAuthContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState({
@@ -11,6 +13,7 @@ const CaptainLogin = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
@@ -31,15 +34,23 @@ const CaptainLogin = () => {
     try {
       const { data } = await captainLogin({ email, password });
 
-      if (data?.status !== "success") {
-        toast.error("Invalid email or password", { id: toastId });
+      if (data.status !== "success") {
+        throw new Error(data.message);
       }
 
       setEmail("");
       setPassword("");
+      setCaptain(data.data.captain);
+      setIsAuth(true);
+      localStorage.setItem("authToken", data.data.token);
+
+      setTimeout(() => {
+        navigate("/captain-home");
+      }, 200);
 
       toast.success("Logged in successfully!", { id: toastId });
     } catch (error) {
+      console.error(error);
       toast.error("Invalid email or password", { id: toastId });
     } finally {
       setLoading(false);

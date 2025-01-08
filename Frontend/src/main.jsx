@@ -5,14 +5,17 @@ import App from "./App.jsx";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { UserAuthConextProvider } from "./context/userAuthContext.jsx";
+import { CaptainAuthConextProvider } from "./context/captainAuthContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <UserAuthConextProvider>
-      <Router>
-        <App />
-        <Toaster />
-      </Router>
-    </UserAuthConextProvider>
+    <Router>
+      <CaptainAuthConextProvider>
+        <UserAuthConextProvider>
+          <App />
+          <Toaster />
+        </UserAuthConextProvider>
+      </CaptainAuthConextProvider>
+    </Router>
   </StrictMode>
 );

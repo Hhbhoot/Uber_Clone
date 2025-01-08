@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import {
+  CaptainHome,
   CaptainLogin,
   CaptainSignup,
   Home,
@@ -10,6 +11,7 @@ import {
   UserSignup,
 } from "./pages";
 import UserProtectedRoutes from "./components/UserProtectedRoutes";
+import CaptainProtectedRoutes from "./components/CaptainProtectedRoutes";
 
 function App() {
   return (
@@ -27,6 +29,14 @@ function App() {
             <UserProtectedRoutes>
               <Home />
             </UserProtectedRoutes>
+          }
+        />
+        <Route
+          path="/captain-home"
+          element={
+            <CaptainProtectedRoutes>
+              <CaptainHome />
+            </CaptainProtectedRoutes>
           }
         />
       </Routes>

@@ -109,7 +109,7 @@ export const LoginCaptain = async (req, res, next) => {
     }
     const token = captain.generateAuthToken();
 
-    return res.status(200).json({
+    res.status(200).json({
       status: "success",
       message: "Logged in Successfully",
       data: {
@@ -131,6 +131,28 @@ export const CaptainProfile = async (req, res, next) => {
     return res.status(200).json({
       status: "success",
       message: "Captain profile fetched successfully",
+      data: {
+        captain,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      error: error?.message || "Internal Server Error",
+    });
+  }
+};
+
+export const updateDrivingStatus = async (req, res, next) => {
+  try {
+    const captain = await CaptainModel.findOneAndUpdate(
+      { _id: req?.captain?._id },
+      { status: req?.captain?.status === "active" ? "inactive" : "active" },
+      { new: true }
+    );
+    return res.status(200).json({
+      status: "success",
+      message: "Captain profile updated successfully",
       data: {
         captain,
       },

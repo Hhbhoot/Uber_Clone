@@ -5,6 +5,7 @@ import {
   LoginCaptain,
   LogoutCaptain,
   RegisterCaptain,
+  updateDrivingStatus,
 } from "../Controllers/captain.controller.js";
 import upload from "../utils/multer.js";
 import captainAuth from "../middleware/captainAuth.js";
@@ -53,6 +54,8 @@ Router.route("/login").post(
 );
 
 Router.route("/profile").get(captainAuth, CaptainProfile);
+
+Router.route("/update-status").patch(captainAuth, updateDrivingStatus);
 
 Router.route("/logout").get(captainAuth, LogoutCaptain);
 
