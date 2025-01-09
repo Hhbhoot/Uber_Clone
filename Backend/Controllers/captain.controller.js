@@ -173,6 +173,10 @@ export const LogoutCaptain = async (req, res, next) => {
 
     await BlackListedTokenModel.create({ token });
 
+    await CaptainModel.findByIdAndUpdate(req?.captain?._id, {
+      status: "inactive",
+    });
+
     return res.status(200).json({
       status: "success",
       message: "Logged out Successfully",

@@ -34,3 +34,19 @@ export const RegisterCaptainService = async ({
     throw err;
   }
 };
+
+export const updateDriverLocationService = async (captainId, location) => {
+  if (!captainId || !location) {
+    throw new Error("Please fill in all fields");
+  }
+
+  try {
+    const captain = await CaptainModel.findByIdAndUpdate(captainId, location, {
+      new: true,
+    });
+    return captain;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

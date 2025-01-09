@@ -75,3 +75,5 @@ export const createRides = async (req, res, next) => {
     },
   });
 };
+
+export const findAvailableDriver = async (req, res, next) => {};
