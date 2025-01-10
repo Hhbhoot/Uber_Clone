@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import {
@@ -12,8 +12,25 @@ import {
 } from "./pages";
 import UserProtectedRoutes from "./components/UserProtectedRoutes";
 import CaptainProtectedRoutes from "./components/CaptainProtectedRoutes";
+import useUserAuthConext from "./context/userAuthContext";
+import useCaptainAuthContext from "./context/captainAuthContext";
 
 function App() {
+  const { setUser } = useUserAuthConext();
+  const { setCaptain } = useCaptainAuthContext();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedCaptain = localStorage.getItem("captain");
+
+    if (storedCaptain) {
+      setCaptain(JSON.parse(storedCaptain));
+      setUser(null); // Ensure only one is active
+    } else if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setCaptain(null); // Ensure only one is active
+    }
+  }, []);
+
   return (
     <>
       <Routes>

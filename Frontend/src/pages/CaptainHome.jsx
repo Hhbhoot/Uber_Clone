@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import useCaptainAuthContext from "../context/captainAuthContext";
 import { TbClockHour3 } from "react-icons/tb";
@@ -10,9 +10,38 @@ import CaptianDetails from "../components/CaptianDetails";
 import RideDetailsPopUp from "../components/RideDetailsPopUp";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useSocket } from "../context/SocketContext";
 
 const CaptainHome = () => {
+  const { socket } = useSocket();
   const { setCaptain, captain, handleCaptainLogout } = useCaptainAuthContext();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("connect", () => {
+      console.log("Connected to the server");
+    });
+
+    if (captain && captain._id) {
+      socket.emit("join", {
+        captainId: captain._id,
+        userType: "captain",
+      });
+    } else {
+      console.error("cap or captain._id is not available");
+    }
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from the server");
+    });
+
+    // Cleanup the socket listeners
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+    };
+  }, [socket, captain]);
 
   const [openRideDetails, setOpenRideDetails] = useState(true);
   const RideDetailsPanelRef = useRef(null);

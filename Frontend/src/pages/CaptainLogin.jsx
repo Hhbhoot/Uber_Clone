@@ -43,6 +43,7 @@ const CaptainLogin = () => {
       setCaptain(data.data.captain);
       setIsAuth(true);
       localStorage.setItem("authToken", data.data.token);
+      localStorage.setItem("captain", JSON.stringify(data.data.captain));
 
       setTimeout(() => {
         navigate("/captain-home");

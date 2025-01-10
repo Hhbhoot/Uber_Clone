@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema(
     socketId: {
       type: String, // for live tracking of user
     },
+    role: {
+      type: String,
+      enum: ["user", "captain", "admin"],
+      default: "user",
+    },
   },
   {
     timestamps: true,
@@ -57,6 +62,7 @@ userSchema.methods.generateToken = function () {
     {
       id: this._id,
       email: this.email,
+      role: this.role,
     },
     process.env.SECRET_KEY,
     {

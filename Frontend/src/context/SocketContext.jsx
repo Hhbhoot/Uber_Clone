@@ -10,6 +10,9 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
   const navigate = useNavigate();
+
+  if (localStorage.getItem("authToken") === null) navigate("/captain-login");
+
   const socket = io(Socket_Server_Url, {
     transports: ["websocket"],
     autoConnect: true,

@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import React from "react";
 import { userTokenCheck } from "../apis";
+import useUserAuthConext from "../context/userAuthContext";
 
 const UserProtectedRoutes = ({ children }) => {
   const validateToken = async () => {

@@ -6,8 +6,6 @@ const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-  // Do something before request is sent
-
   let token = localStorage.getItem("authToken") || null;
   config.headers.authorization = `Bearer ${token}`;
   return config;
@@ -44,3 +42,6 @@ export const getFareDetails = async (data, params, headers) =>
 
 export const captainLogut = async (params, headers) =>
   http.get("/api/v1/captain/logout", { params, headers });
+
+export const userLogut = async (params, headers) =>
+  http.get("/api/v1/user/logout", { params, headers });

@@ -87,6 +87,12 @@ const captainSchema = new mongoose.Schema(
         },
       ],
     },
+
+    role: {
+      type: String,
+      enum: ["captain"],
+      default: "captain",
+    },
   },
   {
     timestamps: true,
@@ -103,7 +109,7 @@ captainSchema.methods.comparePassword = async function (password) {
 
 captainSchema.methods.generateAuthToken = function () {
   const token = jwt.sign(
-    { id: this._id, email: this.email },
+    { id: this._id, email: this.email, role: this.role },
     process.env.SECRET_KEY,
     {
       expiresIn: "24h",

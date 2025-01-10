@@ -8,8 +8,42 @@ import toast from "react-hot-toast";
 import ChooseVehiclePanel from "../components/ChooseVehiclePanel";
 import VehicleDetailsPage from "../components/VehicleDetailsPage";
 import LookingForDriver from "../components/LookingForDriver";
+import { useSocket } from "../context/SocketContext";
+import useUserAuthConext from "../context/userAuthContext";
+import { FiLogOut } from "react-icons/fi";
 
 const Home = () => {
+  const { socket } = useSocket();
+  const { user, handleUserLogout } = useUserAuthConext();
+  console.log(user);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("connect", () => {
+      console.log("Connected to the server");
+    });
+
+    if (user && user._id) {
+      socket.emit("join", {
+        userId: user._id,
+        userType: "user",
+      });
+    } else {
+      console.error("User or user._id is not available");
+    }
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from the server");
+    });
+
+    // Cleanup the socket listeners
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+    };
+  }, [socket, user]);
+
   const [pickup, setpickup] = useState("");
   const [destination, setdestination] = useState("");
   const [currentField, setCurrentField] = useState("");
@@ -215,6 +249,13 @@ const Home = () => {
         className="absolute w-32 h-20"
         alt="uberlogo"
       />
+
+      <div
+        className="absolute top-6 right-4 bg-white p-2 z-10  rounded-full cursor-pointer"
+        onClick={handleUserLogout}
+      >
+        <FiLogOut className="text-md " />
+      </div>
 
       <div className="">
         <img

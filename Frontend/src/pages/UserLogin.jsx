@@ -40,6 +40,7 @@ const UserLogin = () => {
 
       setIsAuth(true);
       setUser(data?.data?.user);
+      localStorage.setItem("user", JSON.stringify(data?.data?.user));
       localStorage.setItem("authToken", data?.data?.token);
 
       setEmail("");
