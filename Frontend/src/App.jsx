@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import {
   CaptainHome,
   CaptainLogin,
+  CaptainRiding,
   CaptainSignup,
   Home,
   Start,
@@ -53,6 +54,14 @@ function App() {
           element={
             <CaptainProtectedRoutes>
               <CaptainHome />
+            </CaptainProtectedRoutes>
+          }
+        />
+        <Route
+          path="/captain-riding"
+          element={
+            <CaptainProtectedRoutes>
+              <CaptainRiding />
             </CaptainProtectedRoutes>
           }
         />

@@ -38,6 +38,18 @@ const userSchema = new mongoose.Schema(
     socketId: {
       type: String, // for live tracking of user
     },
+
+    location: {
+      type: {
+        type: String,
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number],
+        default: [0, 0],
+      },
+    },
+
     role: {
       type: String,
       enum: ["user", "captain", "admin"],

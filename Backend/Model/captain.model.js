@@ -99,6 +99,8 @@ const captainSchema = new mongoose.Schema(
   }
 );
 
+captainSchema.index({ location: "2dsphere" });
+
 captainSchema.statics.hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };

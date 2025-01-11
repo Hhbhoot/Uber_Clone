@@ -14,7 +14,7 @@ const InitializeSocket = (server) => {
   io.use(async (socket, next) => {
     const token = socket.handshake.query.token;
 
-    if (!token) {
+    if (!token || token === "null") {
       return;
     }
 
@@ -48,6 +48,35 @@ const InitializeSocket = (server) => {
         await CaptainModel.findByIdAndUpdate(data.userId, {
           socketId: socket.id,
         });
+      }
+    });
+
+    socket.on("locationUpdate", async (data) => {
+      if (data?.captainId) {
+        const captain = await CaptainModel.findById(data.captainId);
+        if (!captain) {
+          return;
+        }
+
+        await CaptainModel.findByIdAndUpdate(
+          data.captainId,
+          {
+            "location.coordinates": [data.location.lng, data.location.lat],
+          },
+          { new: true }
+        );
+      } else if (data?.userId) {
+        const user = await User.findById(data.userId);
+        if (!user) {
+          return;
+        }
+        await User.findByIdAndUpdate(
+          data.userId,
+          {
+            "location.coordinates": [data.location.lng, data.location.lat],
+          },
+          { new: true }
+        );
       }
     });
 

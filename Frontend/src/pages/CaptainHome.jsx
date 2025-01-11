@@ -11,6 +11,8 @@ import RideDetailsPopUp from "../components/RideDetailsPopUp";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
+import ConfirmRidePopup from "../components/ConfirmRidePopup";
+import { getUserLocation } from "../Utils/GetLocation";
 
 const CaptainHome = () => {
   const { socket } = useSocket();
@@ -29,22 +31,56 @@ const CaptainHome = () => {
         userType: "captain",
       });
     } else {
-      console.error("cap or captain._id is not available");
+      console.error("Captain or captain._id is not available");
+    }
+
+    // Function to send location to the backend
+    const sendLocation = (position) => {
+      const location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      socket.emit("locationUpdate", {
+        captainId: captain?._id,
+        location,
+      });
+    };
+
+    // Watch user's location
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          sendLocation(position);
+        },
+        (error) => {
+          console.error("Error watching position:", error);
+        },
+        { enableHighAccuracy: true } // Use high accuracy for better results
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
     }
 
     socket.on("disconnect", () => {
       console.log("Disconnected from the server");
     });
 
-    // Cleanup the socket listeners
+    // Cleanup the socket listeners and geolocation watch
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
     };
   }, [socket, captain]);
 
   const [openRideDetails, setOpenRideDetails] = useState(true);
   const RideDetailsPanelRef = useRef(null);
+
+  const [ConfirmRidePanel, setConfirmRidePanel] = useState(false);
+  const ConfirmRidePanelRef = useRef(null);
 
   const handleUpdateDriving = async () => {
     try {
@@ -72,6 +108,20 @@ const CaptainHome = () => {
     }
   }, [openRideDetails]);
 
+  useGSAP(() => {
+    if (ConfirmRidePanel) {
+      gsap.to(ConfirmRidePanelRef.current, {
+        transform: "translateY(0)",
+        duration: 1,
+      });
+    } else {
+      gsap.to(ConfirmRidePanelRef.current, {
+        transform: "translateY(100%)",
+        duration: 1,
+      });
+    }
+  }, [ConfirmRidePanel]);
+
   return (
     <div className="h-screen w-full relative overflow-hidden ">
       <img
@@ -87,7 +137,10 @@ const CaptainHome = () => {
         <FiLogOut className="text-md " />
       </div>
 
-      <div className="absolute top-6 right-[40%]" onClick={handleUpdateDriving}>
+      <div
+        className="absolute z-0 top-6 right-[40%]"
+        onClick={handleUpdateDriving}
+      >
         <GoOnlineButton />
       </div>
       <div className="w-full h-[65%]">
@@ -106,7 +159,17 @@ const CaptainHome = () => {
         ref={RideDetailsPanelRef}
         className="w-full bg-white rounded-t-4xl translate-y-full absolute bottom-0 "
       >
-        <RideDetailsPopUp setOpenRideDetails={setOpenRideDetails} />
+        <RideDetailsPopUp
+          setOpenRideDetails={setOpenRideDetails}
+          setConfirmRidePanel={setConfirmRidePanel}
+        />
+      </div>
+
+      <div
+        ref={ConfirmRidePanelRef}
+        className="w-full bg-white rounded-t-4xl h-screen translate-y-full  absolute bottom-0 "
+      >
+        <ConfirmRidePopup setConfirmRidePanel={setConfirmRidePanel} />
       </div>
     </div>
   );

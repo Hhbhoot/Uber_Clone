@@ -5,6 +5,7 @@ import {
 } from "../Services/map.services.js";
 import { createRideService } from "../Services/ride.services.js";
 import RidesModel from "../Model/rides.model.js";
+import { io } from "../server.js";
 
 export const createRides = async (req, res, next) => {
   const errors = validationResult(req);
@@ -66,6 +67,8 @@ export const createRides = async (req, res, next) => {
       message: "Failed to create ride",
     });
   }
+
+  io.emit("newRide", newRide);
 
   return res.status(200).json({
     status: "success",

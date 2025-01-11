@@ -1,10 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const RideDetailsPopUp = (props) => {
+const ConfirmRidePopup = (props) => {
   return (
     <div className="mx-1">
       <div className="text-xl font-bold p-4">
-        <h1 className="text-start">New Ride Available !</h1>
+        <h1 className="text-start capitalize">Confirm Ride!</h1>
       </div>
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center justify-between flex-wrap w-full bg-[#eee]  p-4">
@@ -36,21 +37,19 @@ const RideDetailsPopUp = (props) => {
             Lorem ipsum dolor sit amet.
           </p>
         </div>
-        <div className="flex items-center justify-around gap-4 w-full p-4">
-          <button
-            className="font-medium text-white w-full bg-green-500 px-8 py-2 rounded-xl"
-            onClick={() => {
-              props.setConfirmRidePanel(true);
-              props.setOpenRideDetails(false);
-            }}
+        <div className="flex flex-col items-center justify-around gap-4 w-full p-4">
+          <Link
+            to="/captain-riding"
+            className="font-medium text-white text-center w-full bg-green-500 px-8 py-2 rounded-xl"
+            onClick={() => props.setConfirmRidePanel(false)}
           >
-            Accept
-          </button>
+            Confirm
+          </Link>
           <button
-            className="font-medium text-white w-full bg-gray-800 px-8 py-2 rounded-xl"
-            onClick={() => props.setOpenRideDetails(false)}
+            className="font-medium text-white w-full bg-red-600 px-8 py-2 rounded-xl"
+            onClick={() => props.setConfirmRidePanel(false)}
           >
-            Ignore
+            Cancel
           </button>
         </div>
       </div>
@@ -58,4 +57,4 @@ const RideDetailsPopUp = (props) => {
   );
 };
 
-export default RideDetailsPopUp;
+export default ConfirmRidePopup;

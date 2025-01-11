@@ -15,7 +15,6 @@ import { FiLogOut } from "react-icons/fi";
 const Home = () => {
   const { socket } = useSocket();
   const { user, handleUserLogout } = useUserAuthConext();
-  console.log(user);
 
   useEffect(() => {
     if (!socket) return;
@@ -37,10 +36,39 @@ const Home = () => {
       console.log("Disconnected from the server");
     });
 
+    const sendLocation = (position) => {
+      const location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      socket.emit("locationUpdate", {
+        userId: user?._id,
+        location,
+      });
+    };
+
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          sendLocation(position);
+        },
+        (error) => {
+          console.error("Error watching position:", error);
+        },
+        { enableHighAccuracy: true } // Use high accuracy for better results
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+
     // Cleanup the socket listeners
     return () => {
       socket.off("connect");
       socket.off("disconnect");
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
     };
   }, [socket, user]);
 

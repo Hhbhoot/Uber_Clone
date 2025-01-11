@@ -24,7 +24,7 @@ getIpAddress();
 
 const server = http.createServer(app);
 
-InitializeSocket(server);
+export const io = InitializeSocket(server);
 
 const PORT = process.env.PORT || 5000;
 
