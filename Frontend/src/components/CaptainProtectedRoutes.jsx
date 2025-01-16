@@ -1,8 +1,10 @@
 import React from "react";
 import { captainTokenCheck } from "../apis";
 import { Navigate } from "react-router-dom";
+import useCaptainAuthContext from "../context/captainAuthContext";
 
 const CaptainProtectedRoutes = ({ children }) => {
+  const { setCaptain } = useCaptainAuthContext();
   const validateToken = async () => {
     try {
       const { data } = await captainTokenCheck();

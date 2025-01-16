@@ -1,4 +1,5 @@
 import CaptainModel from "../Model/captain.model.js";
+import { getLatLongFromAddress } from "./map.services.js";
 
 export const RegisterCaptainService = async ({
   fullName,
@@ -45,6 +46,35 @@ export const updateDriverLocationService = async (captainId, location) => {
       new: true,
     });
     return captain;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const findAvailableCaptainService = async (location, vehicleType) => {
+  if (!location || !vehicleType) {
+    throw new Error("Please fill in all fields");
+  }
+
+  const { latitude, longitude } = await getLatLongFromAddress(location);
+
+  try {
+    const captains = await CaptainModel.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [longitude, latitude],
+          },
+          $maxDistance: 50000,
+        },
+      },
+      drivingStatus: "available",
+      "vehicle.type": vehicleType,
+    });
+
+    return captains;
   } catch (err) {
     console.error(err);
     throw err;

@@ -8,8 +8,6 @@ export async function getLatLongFromAddress(address) {
       address
     )}&key=${apiKey}`;
 
-    console.log(url);
-
     // Make the API request
     const response = await axios.get(url);
 

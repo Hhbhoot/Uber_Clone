@@ -3,7 +3,7 @@ import gsap from "gsap";
 import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import SearchLocationSuggestion from "../components/SearchLocationSuggestion";
-import { getFareDetails, getSuggestions } from "../apis";
+import { confirmRideBooking, getFareDetails, getSuggestions } from "../apis";
 import toast from "react-hot-toast";
 import ChooseVehiclePanel from "../components/ChooseVehiclePanel";
 import VehicleDetailsPage from "../components/VehicleDetailsPage";
@@ -193,6 +193,22 @@ const Home = () => {
     getTimeAndDistance();
   };
 
+  const confirmRide = async () => {
+    try {
+      const { data } = await confirmRideBooking({
+        pickup,
+        destination,
+        vehicleType,
+      });
+
+      if (data?.status !== "success") {
+        toast.error(data?.message || "Failed to confirm ride.");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useGSAP(
     function () {
       if (panelOpen) {
@@ -341,7 +357,7 @@ const Home = () => {
               type="submit"
               className="bg-black text-white font-medium px-12 py-3 rounded-md"
             >
-              Search
+              Find a trip
             </button>
           </form>
         </div>
@@ -378,6 +394,7 @@ const Home = () => {
           destination={destination}
           fare={fare}
           vehicleType={vehicleType}
+          confirmRide={confirmRide}
         />
       </div>
 

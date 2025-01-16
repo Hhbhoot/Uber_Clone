@@ -45,13 +45,14 @@ const InitializeSocket = (server) => {
       if (data.userType === "user") {
         await User.findByIdAndUpdate(data.userId, { socketId: socket.id });
       } else if (data.userType === "captain") {
-        await CaptainModel.findByIdAndUpdate(data.userId, {
+        await CaptainModel.findByIdAndUpdate(data.captainId, {
           socketId: socket.id,
         });
       }
     });
 
     socket.on("locationUpdate", async (data) => {
+      console.log(data);
       if (data?.captainId) {
         const captain = await CaptainModel.findById(data.captainId);
         if (!captain) {
@@ -66,6 +67,7 @@ const InitializeSocket = (server) => {
           { new: true }
         );
       } else if (data?.userId) {
+        console.log(data);
         const user = await User.findById(data.userId);
         if (!user) {
           return;
@@ -84,6 +86,8 @@ const InitializeSocket = (server) => {
       console.log("user disconnected");
     });
   });
+
+  return io;
 };
 
 export default InitializeSocket;

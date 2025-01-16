@@ -147,7 +147,12 @@ export const updateDrivingStatus = async (req, res, next) => {
   try {
     const captain = await CaptainModel.findOneAndUpdate(
       { _id: req?.captain?._id },
-      { status: req?.captain?.status === "active" ? "inactive" : "active" },
+      {
+        status: req?.captain?.status === "active" ? "inactive" : "active",
+        drivingStatus:
+          req?.captain?.status === "active" ? "onBreak" : "available",
+      },
+
       { new: true }
     );
     return res.status(200).json({

@@ -14,8 +14,6 @@ export const CaptainAuthConextProvider = ({ children }) => {
   const { socket } = useSocket();
 
   const handleCaptainLogout = async () => {
-    const token = localStorage.getItem("authToken");
-
     if (token) {
       const { data } = await captainLogut();
       if (data?.status !== "success") {

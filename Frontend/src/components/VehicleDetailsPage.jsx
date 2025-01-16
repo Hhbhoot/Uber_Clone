@@ -51,7 +51,9 @@ const VehicleDetailsPage = (props) => {
 
       <button
         className="bg-black mt-2 w-full  text-center  hover:bg-gray-700 text-white font-bold  text-xl py-2 px-8 rounded-md"
+        type="submit"
         onClick={() => {
+          props.confirmRide();
           props.setLookingForDriver(true);
           props.setvehicleDetailsOpen(false);
         }}

@@ -6,6 +6,7 @@ import {
 import { createRideService } from "../Services/ride.services.js";
 import RidesModel from "../Model/rides.model.js";
 import { io } from "../server.js";
+import { findAvailableCaptainService } from "../Services/captain.services.js";
 
 export const createRides = async (req, res, next) => {
   const errors = validationResult(req);
@@ -68,14 +69,24 @@ export const createRides = async (req, res, next) => {
     });
   }
 
-  io.emit("newRide", newRide);
-
-  return res.status(200).json({
+  res.status(200).json({
     status: "success",
     message: "Ride created successfully",
     data: {
       newRide,
     },
+  });
+
+  const captains = await findAvailableCaptainService(
+    pickup,
+    newRide.vehicleType
+  );
+
+  captains.forEach((captain) => {
+    console.log(captain.socketId);
+    io.to(captain.socketId).emit("new-ride", {
+      newRide,
+    });
   });
 };
 

@@ -45,3 +45,6 @@ export const captainLogut = async (params, headers) =>
 
 export const userLogut = async (params, headers) =>
   http.get("/api/v1/user/logout", { params, headers });
+
+export const confirmRideBooking = async (data, params, headers) =>
+  http.post("/api/v1/rides/create-ride", data, { params, headers });

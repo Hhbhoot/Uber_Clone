@@ -15,6 +15,8 @@ import ConfirmRidePopup from "../components/ConfirmRidePopup";
 import { getUserLocation } from "../Utils/GetLocation";
 
 const CaptainHome = () => {
+  const [rideDetails, setRideDetails] = useState(null);
+
   const { socket } = useSocket();
   const { setCaptain, captain, handleCaptainLogout } = useCaptainAuthContext();
 
@@ -45,6 +47,10 @@ const CaptainHome = () => {
         location,
       });
     };
+
+    socket.on("new-ride", (data) => {
+      setRideDetails(data);
+    });
 
     // Watch user's location
     let watchId;

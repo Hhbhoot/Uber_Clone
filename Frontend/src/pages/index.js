@@ -6,3 +6,4 @@ export { default as CaptainSignup } from "./CaptainSignup";
 export { default as Home } from "./Home";
 export { default as CaptainHome } from "./CaptainHome";
 export { default as CaptainRiding } from "./CaptainRiding";
+export { default as Map } from "./Map";
