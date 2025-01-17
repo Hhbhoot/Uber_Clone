@@ -1,7 +1,8 @@
 import express from "express";
 import { body } from "express-validator";
 import { userAuthMiddleware } from "../middleware/userAuth.js";
-import { createRides } from "../Controllers/rides.controller.js";
+import captainAuth from "../middleware/captainAuth.js";
+import { confirmRide, createRides } from "../Controllers/rides.controller.js";
 
 const router = express.Router();
 
@@ -19,6 +20,14 @@ router
         .withMessage("Invalid vehicle type"),
     ],
     createRides
+  );
+
+router
+  .route("/confirm-ride")
+  .post(
+    captainAuth,
+    [body("rideId").isMongoId().withMessage("Invalid Ride Id")],
+    confirmRide
   );
 
 export default router;

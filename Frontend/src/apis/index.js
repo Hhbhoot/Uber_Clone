@@ -48,3 +48,6 @@ export const userLogut = async (params, headers) =>
 
 export const confirmRideBooking = async (data, params, headers) =>
   http.post("/api/v1/rides/create-ride", data, { params, headers });
+
+export const confirmRide = async (data, params, headers) =>
+  http.post("/api/v1/rides/confirm-ride", data, { params, headers });

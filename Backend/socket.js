@@ -52,7 +52,6 @@ const InitializeSocket = (server) => {
     });
 
     socket.on("locationUpdate", async (data) => {
-      console.log(data);
       if (data?.captainId) {
         const captain = await CaptainModel.findById(data.captainId);
         if (!captain) {
@@ -67,7 +66,6 @@ const InitializeSocket = (server) => {
           { new: true }
         );
       } else if (data?.userId) {
-        console.log(data);
         const user = await User.findById(data.userId);
         if (!user) {
           return;

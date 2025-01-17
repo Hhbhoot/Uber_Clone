@@ -16,62 +16,6 @@ const Home = () => {
   const { socket } = useSocket();
   const { user, handleUserLogout } = useUserAuthConext();
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("connect", () => {
-      console.log("Connected to the server");
-    });
-
-    if (user && user._id) {
-      socket.emit("join", {
-        userId: user._id,
-        userType: "user",
-      });
-    } else {
-      console.error("User or user._id is not available");
-    }
-
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the server");
-    });
-
-    const sendLocation = (position) => {
-      const location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
-      socket.emit("locationUpdate", {
-        userId: user?._id,
-        location,
-      });
-    };
-
-    let watchId;
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          sendLocation(position);
-        },
-        (error) => {
-          console.error("Error watching position:", error);
-        },
-        { enableHighAccuracy: true } // Use high accuracy for better results
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
-
-    // Cleanup the socket listeners
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [socket, user]);
-
   const [pickup, setpickup] = useState("");
   const [destination, setdestination] = useState("");
   const [currentField, setCurrentField] = useState("");
@@ -91,6 +35,9 @@ const Home = () => {
 
   const [lookingForDriver, setLookingForDriver] = useState(false);
   const lookingForDriverRef = useRef(null);
+
+  const [WaitingForDriver, setWaitingForDriver] = useState(false);
+  const WaitingForDriverRef = useRef(null);
 
   const [fare, setFare] = useState({});
   const [distance, setDistance] = useState("");
@@ -271,6 +218,83 @@ const Home = () => {
 
   useGSAP(
     function () {
+      if (WaitingForDriver) {
+        gsap.to(WaitingForDriverRef.current, {
+          transform: "translateY(0)",
+          duration: 0.5,
+        });
+      } else {
+        gsap.to(WaitingForDriverRef.current, {
+          transform: "translateY(100%)",
+          duration: 0.5,
+        });
+      }
+    },
+    [WaitingForDriver]
+  );
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("connect", () => {
+      console.log("Connected to the server");
+    });
+
+    if (user && user._id) {
+      socket.emit("join", {
+        userId: user._id,
+        userType: "user",
+      });
+    } else {
+      console.error("User or user._id is not available");
+    }
+
+    socket.on("confirm-ride", (data) => {
+      console.log(data);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from the server");
+    });
+
+    const sendLocation = (position) => {
+      const location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      socket.emit("locationUpdate", {
+        userId: user?._id,
+        location,
+      });
+    };
+
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          sendLocation(position);
+        },
+        (error) => {
+          console.error("Error watching position:", error);
+        },
+        { enableHighAccuracy: true } // Use high accuracy for better results
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+
+    // Cleanup the socket listeners
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [socket, user]);
+
+  useGSAP(
+    function () {
       if (lookingForDriver) {
         gsap.to(lookingForDriverRef.current, {
           duration: 0.5,
@@ -409,6 +433,18 @@ const Home = () => {
           fare={fare}
         />
       </div>
+
+      {/* <div
+        ref={WaitingForDriverRef}
+        className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
+      >
+        <WaitingForDriver
+          vehicleType={vehicleType}
+          pickup={pickup}
+          destination={destination}
+          fare={fare}
+        />
+      </div> */}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { TbClockHour3 } from "react-icons/tb";
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { LuNotebookTabs } from "react-icons/lu";
 import GoOnlineButton from "../components/GoOnlineButton";
-import { updateDrivingStatus } from "../apis";
+import { confirmRide, updateDrivingStatus } from "../apis";
 import CaptianDetails from "../components/CaptianDetails";
 import RideDetailsPopUp from "../components/RideDetailsPopUp";
 import { useGSAP } from "@gsap/react";
@@ -20,73 +20,20 @@ const CaptainHome = () => {
   const { socket } = useSocket();
   const { setCaptain, captain, handleCaptainLogout } = useCaptainAuthContext();
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.on("connect", () => {
-      console.log("Connected to the server");
-    });
-
-    if (captain && captain._id) {
-      socket.emit("join", {
-        captainId: captain._id,
-        userType: "captain",
-      });
-    } else {
-      console.error("Captain or captain._id is not available");
-    }
-
-    // Function to send location to the backend
-    const sendLocation = (position) => {
-      const location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-      };
-      socket.emit("locationUpdate", {
-        captainId: captain?._id,
-        location,
-      });
-    };
-
-    socket.on("new-ride", (data) => {
-      setRideDetails(data);
-    });
-
-    // Watch user's location
-    let watchId;
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          sendLocation(position);
-        },
-        (error) => {
-          console.error("Error watching position:", error);
-        },
-        { enableHighAccuracy: true } // Use high accuracy for better results
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
-
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the server");
-    });
-
-    // Cleanup the socket listeners and geolocation watch
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [socket, captain]);
-
-  const [openRideDetails, setOpenRideDetails] = useState(true);
+  const [openRideDetails, setOpenRideDetails] = useState(false);
   const RideDetailsPanelRef = useRef(null);
 
   const [ConfirmRidePanel, setConfirmRidePanel] = useState(false);
   const ConfirmRidePanelRef = useRef(null);
+
+  const handleConfirmRide = async () => {
+    try {
+      const { data } = await confirmRide({ rideId: rideDetails?.newRide?._id });
+      if (data?.status !== "success") throw new Error(data?.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleUpdateDriving = async () => {
     try {
@@ -128,6 +75,70 @@ const CaptainHome = () => {
     }
   }, [ConfirmRidePanel]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("connect", () => {
+      console.log("Connected to the server");
+    });
+
+    if (captain && captain._id) {
+      socket.emit("join", {
+        captainId: captain._id,
+        userType: "captain",
+      });
+    } else {
+      console.error("Captain or captain._id is not available");
+    }
+
+    // Function to send location to the backend
+    const sendLocation = (position) => {
+      const location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      };
+      socket.emit("locationUpdate", {
+        captainId: captain?._id,
+        location,
+      });
+    };
+
+    socket.on("new-ride", (data) => {
+      console.log(data);
+      setRideDetails(data);
+      setOpenRideDetails(true);
+    });
+
+    // Watch user's location
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          sendLocation(position);
+        },
+        (error) => {
+          console.error("Error watching position:", error);
+        },
+        { enableHighAccuracy: true } // Use high accuracy for better results
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+
+    socket.on("disconnect", () => {
+      console.log("Disconnected from the server");
+    });
+
+    // Cleanup the socket listeners and geolocation watch
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [socket, captain]);
+
   return (
     <div className="h-screen w-full relative overflow-hidden ">
       <img
@@ -168,6 +179,7 @@ const CaptainHome = () => {
         <RideDetailsPopUp
           setOpenRideDetails={setOpenRideDetails}
           setConfirmRidePanel={setConfirmRidePanel}
+          rideDetails={rideDetails}
         />
       </div>
 
@@ -175,7 +187,11 @@ const CaptainHome = () => {
         ref={ConfirmRidePanelRef}
         className="w-full bg-white rounded-t-4xl h-screen translate-y-full  absolute bottom-0 "
       >
-        <ConfirmRidePopup setConfirmRidePanel={setConfirmRidePanel} />
+        <ConfirmRidePopup
+          rideDetails={rideDetails}
+          setConfirmRidePanel={setConfirmRidePanel}
+          handleConfirmRide={handleConfirmRide}
+        />
       </div>
     </div>
   );
