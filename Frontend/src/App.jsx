@@ -7,6 +7,7 @@ import {
   CaptainRiding,
   CaptainSignup,
   Home,
+  Riding,
   Start,
   UserLogin,
   UserSignup,
@@ -46,6 +47,14 @@ function App() {
           element={
             <UserProtectedRoutes>
               <Home />
+            </UserProtectedRoutes>
+          }
+        />
+        <Route
+          path="/riding"
+          element={
+            <UserProtectedRoutes>
+              <Riding />
             </UserProtectedRoutes>
           }
         />

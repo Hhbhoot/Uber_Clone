@@ -50,4 +50,7 @@ export const confirmRideBooking = async (data, params, headers) =>
   http.post("/api/v1/rides/create-ride", data, { params, headers });
 
 export const confirmRide = async (data, params, headers) =>
-  http.post("/api/v1/rides/confirm-ride", data, { params, headers });
+  http.patch("/api/v1/rides/confirm-ride", data, { params, headers });
+
+export const startRide = async (data, params, headers) =>
+  http.patch("/api/v1/rides/start-ride", data, { params, headers });

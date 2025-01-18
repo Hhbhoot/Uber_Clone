@@ -6,6 +6,8 @@ import {
 import {
   confirmRideService,
   createRideService,
+  endRideService,
+  startRideService,
 } from "../Services/ride.services.js";
 import RidesModel from "../Model/rides.model.js";
 import { io } from "../server.js";
@@ -88,6 +90,12 @@ export const createRides = async (req, res, next) => {
   const user = req?.user;
   newRide.otp = "";
 
+  if (captains.length === 0) {
+    io.to(req?.user?.socketId).emit("driverNotFound", {
+      data: null,
+    });
+  }
+
   captains.forEach((captain) => {
     console.log(captain.socketId);
     io.to(captain.socketId).emit("new-ride", {
@@ -140,8 +148,6 @@ export const confirmRide = async (req, res, next) => {
     });
   }
 
-  console.log(rideConfirm.user.socketId);
-
   io.to(rideConfirm.user.socketId).emit("confirm-ride", {
     data: rideConfirm,
   });
@@ -149,5 +155,102 @@ export const confirmRide = async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Ride confirmed successfully",
+  });
+};
+
+export const StartRide = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "fail",
+      errors: errors.array(),
+    });
+  }
+
+  const { rideId, otp } = req?.body;
+
+  if (!rideId || !otp) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Ride Id and OTP are required",
+    });
+  }
+
+  const ride = await RidesModel.findById(rideId);
+  if (!ride) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Ride not found",
+    });
+  }
+
+  if (ride.status !== "Accepted") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Ride is not accepted",
+    });
+  }
+
+  const startNewRide = await startRideService(rideId, otp);
+
+  if (!startNewRide) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Failed to start ride",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Ride started successfully",
+  });
+
+  io.to(startNewRide.user.socketId).emit("ride-started", {
+    data: startNewRide,
+  });
+};
+
+export const EndRide = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "fail",
+      errors: errors.array(),
+    });
+  }
+
+  const { rideId } = req?.body;
+
+  const ride = await RidesModel.findById(rideId);
+  if (!ride) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Ride not found",
+    });
+  }
+
+  if (ride.status !== "OnGoing") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Ride is not on going",
+    });
+  }
+
+  const endRide = await endRideService(rideId);
+
+  if (!endRide) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Failed to end ride",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Ride ended successfully",
+  });
+
+  io.to(endRide.user.socketId).emit("ride-ended", {
+    data: endRide,
   });
 };

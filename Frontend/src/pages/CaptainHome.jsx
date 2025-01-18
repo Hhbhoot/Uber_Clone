@@ -5,7 +5,7 @@ import { TbClockHour3 } from "react-icons/tb";
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { LuNotebookTabs } from "react-icons/lu";
 import GoOnlineButton from "../components/GoOnlineButton";
-import { confirmRide, updateDrivingStatus } from "../apis";
+import { confirmRide, startRide, updateDrivingStatus } from "../apis";
 import CaptianDetails from "../components/CaptianDetails";
 import RideDetailsPopUp from "../components/RideDetailsPopUp";
 import { useGSAP } from "@gsap/react";
@@ -13,8 +13,11 @@ import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import ConfirmRidePopup from "../components/ConfirmRidePopup";
 import { getUserLocation } from "../Utils/GetLocation";
+import ConfirmOtp from "../components/ConfirmOtp";
+import { useNavigate } from "react-router-dom";
 
 const CaptainHome = () => {
+  const navigate = useNavigate();
   const [rideDetails, setRideDetails] = useState(null);
 
   const { socket } = useSocket();
@@ -26,10 +29,32 @@ const CaptainHome = () => {
   const [ConfirmRidePanel, setConfirmRidePanel] = useState(false);
   const ConfirmRidePanelRef = useRef(null);
 
+  const [confirmOTP, setConfirmOTP] = useState(false);
+  const confirmOTPRef = useRef(null);
+
+  const [otp, setOtp] = useState("");
+
   const handleConfirmRide = async () => {
     try {
       const { data } = await confirmRide({ rideId: rideDetails?.newRide?._id });
       if (data?.status !== "success") throw new Error(data?.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleConfirmOTP = async () => {
+    try {
+      const { data } = await startRide({
+        rideId: rideDetails?.newRide?._id,
+        otp,
+      });
+      if (data?.status !== "success") throw new Error(data?.message);
+
+      setConfirmOTP(false);
+      navigate("/captain-riding", {
+        state: { rideDetails: rideDetails },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -51,12 +76,14 @@ const CaptainHome = () => {
     if (openRideDetails) {
       gsap.to(RideDetailsPanelRef.current, {
         transform: "translateY(0)",
-        // duration: 1,
+        duration: 1,
+        zIndex: 1,
       });
     } else {
       gsap.to(RideDetailsPanelRef.current, {
         transform: "translateY(100%)",
         duration: 1,
+        zIndex: -1,
       });
     }
   }, [openRideDetails]);
@@ -66,14 +93,32 @@ const CaptainHome = () => {
       gsap.to(ConfirmRidePanelRef.current, {
         transform: "translateY(0)",
         duration: 1,
+        zIndex: 1,
       });
     } else {
       gsap.to(ConfirmRidePanelRef.current, {
         transform: "translateY(100%)",
         duration: 1,
+        zIndex: -1,
       });
     }
   }, [ConfirmRidePanel]);
+
+  useGSAP(() => {
+    if (confirmOTP) {
+      gsap.to(confirmOTPRef.current, {
+        transform: "translateY(0)",
+        duration: 1,
+        zIndex: 1,
+      });
+    } else {
+      gsap.to(confirmOTPRef.current, {
+        transform: "translateY(100%)",
+        duration: 1,
+        zIndex: -1,
+      });
+    }
+  }, [confirmOTP]);
 
   useEffect(() => {
     if (!socket) return;
@@ -82,14 +127,12 @@ const CaptainHome = () => {
       console.log("Connected to the server");
     });
 
-    if (captain && captain._id) {
+    setTimeout(() => {
       socket.emit("join", {
         captainId: captain._id,
         userType: "captain",
       });
-    } else {
-      console.error("Captain or captain._id is not available");
-    }
+    });
 
     // Function to send location to the backend
     const sendLocation = (position) => {
@@ -168,7 +211,7 @@ const CaptainHome = () => {
         />
       </div>
 
-      <div className="w-full h-[35%] bg-white p-2 rounded-t-4xl">
+      <div className="w-full  bg-white p-2 rounded-t-4xl">
         <CaptianDetails />
       </div>
 
@@ -191,6 +234,18 @@ const CaptainHome = () => {
           rideDetails={rideDetails}
           setConfirmRidePanel={setConfirmRidePanel}
           handleConfirmRide={handleConfirmRide}
+          setConfirmOTP={setConfirmOTP}
+        />
+      </div>
+
+      <div
+        ref={confirmOTPRef}
+        className="w-full bg-white rounded-t-4xl h-screen translate-y-full  absolute bottom-0 "
+      >
+        <ConfirmOtp
+          setOtp={setOtp}
+          handleConfirmOTP={handleConfirmOTP}
+          rideDetails={rideDetails}
         />
       </div>
     </div>

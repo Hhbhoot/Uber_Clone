@@ -2,7 +2,12 @@ import express from "express";
 import { body } from "express-validator";
 import { userAuthMiddleware } from "../middleware/userAuth.js";
 import captainAuth from "../middleware/captainAuth.js";
-import { confirmRide, createRides } from "../Controllers/rides.controller.js";
+import {
+  confirmRide,
+  createRides,
+  EndRide,
+  StartRide,
+} from "../Controllers/rides.controller.js";
 
 const router = express.Router();
 
@@ -24,10 +29,29 @@ router
 
 router
   .route("/confirm-ride")
-  .post(
+  .patch(
     captainAuth,
     [body("rideId").isMongoId().withMessage("Invalid Ride Id")],
     confirmRide
+  );
+
+router
+  .route("/start-ride")
+  .patch(
+    captainAuth,
+    [
+      body("rideId").isMongoId().withMessage("Invalid Ride Id"),
+      body("otp").isLength({ min: 6 }).withMessage("Invalid OTP"),
+    ],
+    StartRide
+  );
+
+router
+  .route("/end-ride")
+  .patch(
+    captainAuth,
+    [body("rideId").isMongoId().withMessage("Invalid Ride Id")],
+    EndRide
   );
 
 export default router;

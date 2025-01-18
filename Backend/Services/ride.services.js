@@ -1,3 +1,4 @@
+import CaptainModel from "../Model/captain.model.js";
 import RidesModel from "../Model/rides.model.js";
 
 export const createRideService = async ({
@@ -42,7 +43,7 @@ export const confirmRideService = async (rideId, captainId) => {
   await RidesModel.findByIdAndUpdate(
     rideId,
     {
-      status: "accepted",
+      status: "Accepted",
       captain: captainId,
     },
     {
@@ -50,7 +51,57 @@ export const confirmRideService = async (rideId, captainId) => {
     }
   );
 
+  await CaptainModel.findByIdAndUpdate(captainId, { drivingStatus: "onRide" });
+
   const ride = await RidesModel.findById(rideId).populate("user captain");
+
+  return ride;
+};
+
+export const startRideService = async (rideId, otp) => {
+  if (!rideId || !otp) {
+    throw new Error("Missing required fields");
+  }
+
+  const ride = await RidesModel.findById(rideId).populate("user captain");
+
+  if (ride.otp !== otp) {
+    throw new Error("Invalid OTP");
+  }
+
+  await RidesModel.findByIdAndUpdate(
+    rideId,
+    {
+      status: "OnGoing",
+    },
+    {
+      new: true,
+    }
+  );
+
+  return ride;
+};
+
+export const endRideService = async (rideId) => {
+  if (!rideId) {
+    throw new Error("Missing required fields");
+  }
+  const ride = await RidesModel.findById(rideId).populate("user captain");
+
+  await RidesModel.findByIdAndUpdate(
+    rideId,
+    {
+      status: "Completed",
+      paymentStatus: "paid",
+    },
+    {
+      new: true,
+    }
+  );
+
+  await CaptainModel.findByIdAndUpdate(ride.captain._id, {
+    drivingStatus: "available",
+  });
 
   return ride;
 };

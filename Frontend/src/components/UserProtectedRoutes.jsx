@@ -1,36 +1,52 @@
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import React from "react";
 import { userTokenCheck } from "../apis";
-import useUserAuthConext from "../context/userAuthContext";
+import useUserAuthContext from "../context/userAuthContext";
 
 const UserProtectedRoutes = ({ children }) => {
-  const validateToken = async () => {
-    try {
-      const { data } = await userTokenCheck();
+  const { user, setUser, setIsAuth } = useUserAuthContext();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isValid, setIsValid] = useState(false);
 
-      if (data?.status !== "success") throw new Error(data?.message);
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setIsLoading(false);
+        setIsValid(false);
+        return;
+      }
 
-      return true;
-    } catch (err) {
-      console.log(err);
-      return <Navigate to="/user-login" replace={true} />;
-    }
-  };
+      try {
+        const { data } = await userTokenCheck();
+        if (data?.status === "success") {
+          setUser(data?.data?.user);
+          setIsAuth(true);
+          setIsValid(true);
+        } else {
+          throw new Error(data?.message);
+        }
+      } catch (err) {
+        console.log(err);
+        setIsValid(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const token = localStorage.getItem("authToken");
+    validateToken();
+  }, [setUser, setIsAuth]);
 
-  if (!token) {
-    return <Navigate to="/user-login" replace={true} />;
+  if (isLoading) {
+    // Show a loader or spinner while validating the token
+    return <div>Loading...</div>;
   }
 
-  if (token) {
-    const checkToken = validateToken();
-    if (checkToken) {
-      return children;
-    }
+  if (!isValid) {
+    return <Navigate to="/user-login" replace />;
   }
 
-  // return isAuth ? children : <Navigate to={<Login />} />;
+  return children;
 };
 
 export default UserProtectedRoutes;

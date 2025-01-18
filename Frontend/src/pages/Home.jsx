@@ -11,8 +11,12 @@ import LookingForDriver from "../components/LookingForDriver";
 import { useSocket } from "../context/SocketContext";
 import useUserAuthConext from "../context/userAuthContext";
 import { FiLogOut } from "react-icons/fi";
+import WaitingForDrivers from "../components/WaitingForDrivers";
+import DriverNotFound from "../components/DriverNotFound";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
   const { socket } = useSocket();
   const { user, handleUserLogout } = useUserAuthConext();
 
@@ -38,6 +42,12 @@ const Home = () => {
 
   const [WaitingForDriver, setWaitingForDriver] = useState(false);
   const WaitingForDriverRef = useRef(null);
+
+  const [CaptainDetails, setCaptainDetails] = useState(null);
+  const [rideDetails, setRideDetails] = useState(null);
+
+  const [driverNotFound, setDriverNotFound] = useState(false);
+  const driverNotFoundRef = useRef(null);
 
   const [fare, setFare] = useState({});
   const [distance, setDistance] = useState("");
@@ -187,12 +197,12 @@ const Home = () => {
       if (vehiclePanelOpen) {
         gsap.to(vehiclePanelRef.current, {
           duration: 0.5,
-          height: "70%",
+          transform: "translateY(0)",
         });
       } else {
         gsap.to(vehiclePanelRef.current, {
           duration: 0.5,
-          height: "0%",
+          transform: "translateY(100%)",
         });
       }
     },
@@ -204,12 +214,14 @@ const Home = () => {
       if (vehicleDetailsOpen) {
         gsap.to(vehicleDetailsRef.current, {
           duration: 0.5,
-          height: "70%",
+          transform: "translateY(0)",
+          zIndex: 1,
         });
       } else {
         gsap.to(vehicleDetailsRef.current, {
           duration: 0.5,
-          height: "0%",
+          transform: "translateY(100%)",
+          zIndex: -1,
         });
       }
     },
@@ -222,11 +234,13 @@ const Home = () => {
         gsap.to(WaitingForDriverRef.current, {
           transform: "translateY(0)",
           duration: 0.5,
+          zIndex: 1,
         });
       } else {
         gsap.to(WaitingForDriverRef.current, {
           transform: "translateY(100%)",
           duration: 0.5,
+          zIndex: -1,
         });
       }
     },
@@ -240,17 +254,31 @@ const Home = () => {
       console.log("Connected to the server");
     });
 
-    if (user && user._id) {
+    setTimeout(() => {
       socket.emit("join", {
-        userId: user._id,
+        userId: user?._id,
         userType: "user",
       });
-    } else {
-      console.error("User or user._id is not available");
-    }
+    }, 5000);
 
     socket.on("confirm-ride", (data) => {
-      console.log(data);
+      setLookingForDriver(false);
+      setWaitingForDriver(true);
+      setRideDetails(data?.data);
+      setCaptainDetails(data?.data?.captain);
+    });
+
+    socket.on("ride-started", (data) => {
+      setWaitingForDriver(false);
+      navigate("/riding", {
+        state: { rideDetails: data?.data },
+      });
+    });
+
+    socket.on("driverNotFound", () => {
+      setLookingForDriver(false);
+      setWaitingForDriver(false);
+      setDriverNotFound(true);
     });
 
     socket.on("disconnect", () => {
@@ -298,34 +326,55 @@ const Home = () => {
       if (lookingForDriver) {
         gsap.to(lookingForDriverRef.current, {
           duration: 0.5,
-          height: "70%",
+          transform: "translateY(0)",
+          zIndex: 1,
         });
       } else {
         gsap.to(lookingForDriverRef.current, {
           duration: 0.5,
-          height: "0%",
+          transform: "translateY(100%)",
+          zIndex: -1,
         });
       }
     },
     [lookingForDriver]
   );
 
+  useGSAP(
+    function () {
+      if (driverNotFound) {
+        gsap.to(driverNotFoundRef.current, {
+          duration: 0.5,
+          transform: "translateY(0)",
+          zIndex: 1,
+        });
+      } else {
+        gsap.to(driverNotFoundRef.current, {
+          duration: 0.5,
+          transform: "translateY(100%)",
+          zIndex: -1,
+        });
+      }
+    },
+    [driverNotFound]
+  );
+
   return (
     <div className="h-screen w-full relative overflow-hidden ">
       <img
         src="/img/blackLogo.png"
-        className="absolute w-32 h-20"
+        className="absolute w-32 h-20 z-0"
         alt="uberlogo"
       />
 
       <div
-        className="absolute top-6 right-4 bg-white p-2 z-10  rounded-full cursor-pointer"
+        className="absolute top-6 right-4 bg-white p-2  z-0 rounded-full cursor-pointer"
         onClick={handleUserLogout}
       >
         <FiLogOut className="text-md " />
       </div>
 
-      <div className="">
+      <div className="absolute -z-10">
         <img
           src="/img/ubermap.png"
           alt=""
@@ -396,7 +445,7 @@ const Home = () => {
 
       <div
         ref={vehiclePanelRef}
-        className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
+        className="fixed bottom-0  w-full translate-y-full   bg-[#fff] rounded-t-3xl "
       >
         <ChooseVehiclePanel
           setvehiclePanelOpen={setvehiclePanelOpen}
@@ -409,7 +458,7 @@ const Home = () => {
 
       <div
         ref={vehicleDetailsRef}
-        className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
+        className="fixed bottom-0 w-full translate-y-full   bg-[#fff] rounded-t-3xl "
       >
         <VehicleDetailsPage
           setvehicleDetailsOpen={setvehicleDetailsOpen}
@@ -424,7 +473,7 @@ const Home = () => {
 
       <div
         ref={lookingForDriverRef}
-        className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
+        className="fixed bottom-0  w-full translate-y-full   bg-[#fff] rounded-t-3xl "
       >
         <LookingForDriver
           vehicleType={vehicleType}
@@ -434,17 +483,26 @@ const Home = () => {
         />
       </div>
 
-      {/* <div
+      <div
         ref={WaitingForDriverRef}
-        className="fixed bottom-0 z-10 w-full   bg-[#fff] rounded-t-3xl "
+        className="fixed bottom-0  w-full translate-y-full  bg-[#fff] rounded-t-3xl "
       >
-        <WaitingForDriver
+        <WaitingForDrivers
           vehicleType={vehicleType}
           pickup={pickup}
           destination={destination}
           fare={fare}
+          CaptainDetails={CaptainDetails}
+          rideDetails={rideDetails}
         />
-      </div> */}
+      </div>
+
+      <div
+        ref={driverNotFoundRef}
+        className="fixed bottom-0  w-full translate-y-full  bg-[#fff] rounded-t-3xl "
+      >
+        <DriverNotFound setDriverNotFound={setDriverNotFound} />
+      </div>
     </div>
   );
 };
