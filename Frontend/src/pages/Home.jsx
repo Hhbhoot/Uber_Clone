@@ -14,11 +14,14 @@ import { FiLogOut } from "react-icons/fi";
 import WaitingForDrivers from "../components/WaitingForDrivers";
 import DriverNotFound from "../components/DriverNotFound";
 import { useNavigate } from "react-router-dom";
+import Map from "./Map";
 
 const Home = () => {
   const navigate = useNavigate();
   const { socket } = useSocket();
   const { user, handleUserLogout } = useUserAuthConext();
+
+  const findTripRef = useRef(null);
 
   const [pickup, setpickup] = useState("");
   const [destination, setdestination] = useState("");
@@ -198,11 +201,13 @@ const Home = () => {
         gsap.to(vehiclePanelRef.current, {
           duration: 0.5,
           transform: "translateY(0)",
+          zIndex: 20,
         });
       } else {
         gsap.to(vehiclePanelRef.current, {
           duration: 0.5,
           transform: "translateY(100%)",
+          zIndex: -1,
         });
       }
     },
@@ -215,7 +220,7 @@ const Home = () => {
         gsap.to(vehicleDetailsRef.current, {
           duration: 0.5,
           transform: "translateY(0)",
-          zIndex: 1,
+          zIndex: 20,
         });
       } else {
         gsap.to(vehicleDetailsRef.current, {
@@ -234,7 +239,7 @@ const Home = () => {
         gsap.to(WaitingForDriverRef.current, {
           transform: "translateY(0)",
           duration: 0.5,
-          zIndex: 1,
+          zIndex: 20,
         });
       } else {
         gsap.to(WaitingForDriverRef.current, {
@@ -247,12 +252,23 @@ const Home = () => {
     [WaitingForDriver]
   );
 
+  useGSAP(
+    function () {
+      if (panelOpen) {
+        gsap.to(findTripRef.current, {
+          height: "100vh",
+        });
+      } else {
+        gsap.to(findTripRef.current, {
+          height: "0px",
+        });
+      }
+    },
+    [panelOpen]
+  );
+
   useEffect(() => {
     if (!socket) return;
-
-    socket.on("connect", () => {
-      console.log("Connected to the server");
-    });
 
     setTimeout(() => {
       socket.emit("join", {
@@ -281,10 +297,6 @@ const Home = () => {
       setDriverNotFound(true);
     });
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the server");
-    });
-
     const sendLocation = (position) => {
       const location = {
         lat: position.coords.latitude,
@@ -298,7 +310,7 @@ const Home = () => {
 
     let watchId;
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
+      watchId = navigator.geolocation.getCurrentPosition(
         (position) => {
           sendLocation(position);
         },
@@ -311,10 +323,15 @@ const Home = () => {
       console.error("Geolocation is not supported by this browser.");
     }
 
+    const intervalId = setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation);
+      }
+    }, 5000);
+
     // Cleanup the socket listeners
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
+      clearInterval(intervalId);
       if (watchId) {
         navigator.geolocation.clearWatch(watchId);
       }
@@ -327,7 +344,7 @@ const Home = () => {
         gsap.to(lookingForDriverRef.current, {
           duration: 0.5,
           transform: "translateY(0)",
-          zIndex: 1,
+          zIndex: 20,
         });
       } else {
         gsap.to(lookingForDriverRef.current, {
@@ -363,25 +380,30 @@ const Home = () => {
     <div className="h-screen w-full relative overflow-hidden ">
       <img
         src="/img/blackLogo.png"
-        className="absolute w-32 h-20 z-0"
+        className="absolute w-32 h-20 z-10 top-16"
         alt="uberlogo"
       />
 
       <div
-        className="absolute top-6 right-4 bg-white p-2  z-0 rounded-full cursor-pointer"
+        className="absolute top-20 right-4 bg-white p-2  z-10 rounded-full cursor-pointer"
         onClick={handleUserLogout}
       >
         <FiLogOut className="text-md " />
       </div>
 
-      <div className="absolute -z-10">
-        <img
+      <div className="w-full h-full -z-0">
+        <Map />
+        {/* <img
           src="/img/ubermap.png"
           alt=""
           className="w-full h-screen object-cover"
-        />
+        /> */}
       </div>
-      <div className="flex flex-col justify-end absolute w-full h-screen bottom-0">
+
+      <div
+        className="flex flex-col justify-end absolute w-full z-10   bottom-0"
+        ref={findTripRef}
+      >
         <div className="p-6  w-full bg-white    relative">
           <div
             className="absolute right-6 top-6"

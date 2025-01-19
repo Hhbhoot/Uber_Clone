@@ -1,23 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import Map from "./Map";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import { FaRegCreditCard, FaStop } from "react-icons/fa";
+import useCaptainAuthContext from "../context/captainAuthContext";
+import { endRide } from "../apis";
+import toast from "react-hot-toast";
 
 const CaptainRiding = () => {
+  const navigate = useNavigate();
+  const { captain } = useCaptainAuthContext();
   const { socket } = useSocket();
   const location = useLocation();
   const { rideDetails } = location.state || {};
 
+  console.log(captain.socketId);
+
   console.log("rideDetails", rideDetails);
 
-  const [finishRide, setFinishRide] = useState(true);
+  const [finishRide, setFinishRide] = useState(false);
   const finishRideRef = useRef(null);
 
   useEffect(() => {
-    socket.on("ride-finished", () => {
+    if (!socket) return;
+
+    socket.on("finish-ride", (data) => {
+      console.log("finish-ride", data);
       setFinishRide(true);
     });
   }, [socket]);
@@ -35,6 +45,19 @@ const CaptainRiding = () => {
       });
     }
   }, [finishRide]);
+
+  const handleFinishRide = async () => {
+    try {
+      const { data } = await endRide({ rideId: rideDetails?.newRide?._id });
+      if (data?.status !== "success") throw new Error(data?.message);
+      toast.success("Ride Finished Successfully!");
+
+      navigate("/captain-home");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to finish ride");
+    }
+  };
 
   return (
     <div className="w-full h-screen overflow-hidden">
@@ -55,12 +78,12 @@ const CaptainRiding = () => {
                   alt=""
                 />
                 <h1 className="text-base font-bold">
-                  {rideDetails.user.fullName.firstName}{" "}
-                  {rideDetails.user.fullName.lastName}
+                  {rideDetails?.user?.fullName.firstName}{" "}
+                  {rideDetails?.user?.fullName.lastName}
                 </h1>
               </div>
               <p className="text-xl font-semibold text-gray-500 text-nowrap">
-                {Math.ceil(rideDetails.newRide.distance / 1000)} KM
+                {Math.ceil(rideDetails?.newRide?.distance / 1000)} KM
               </p>
             </div>
 
@@ -73,7 +96,7 @@ const CaptainRiding = () => {
               <div className="flex flex-col p-1 ">
                 <p className="font-bold text-xl">562/11-A </p>
                 <p className="text-base font-normal">
-                  {rideDetails.newRide.destination}
+                  {rideDetails?.newRide?.destination}
                 </p>
               </div>
             </div>
@@ -84,12 +107,17 @@ const CaptainRiding = () => {
                 <FaRegCreditCard />
               </span>
               <div className="flex flex-col p-1 ">
-                <p className="font-bold text-xl">₹{rideDetails.newRide.fare}</p>
+                <p className="font-bold text-xl">
+                  ₹{rideDetails?.newRide?.fare}
+                </p>
                 <p className="text-base font-normal ">Cash</p>
               </div>
             </div>
 
-            <button className="bg-green-500 text-white p-3 text-base rounded-xl mt-5 w-full">
+            <button
+              className="bg-green-500 text-white p-3 text-base rounded-xl mt-5 w-full"
+              onClick={handleFinishRide}
+            >
               Finish Ride
             </button>
           </div>

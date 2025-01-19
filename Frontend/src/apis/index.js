@@ -43,6 +43,9 @@ export const getFareDetails = async (data, params, headers) =>
 export const captainLogut = async (params, headers) =>
   http.get("/api/v1/captain/logout", { params, headers });
 
+export const captainRideHistory = async (params, headers) =>
+  http.get("/api/v1/captain/ride-history", { params, headers });
+
 export const userLogut = async (params, headers) =>
   http.get("/api/v1/user/logout", { params, headers });
 
@@ -54,3 +57,9 @@ export const confirmRide = async (data, params, headers) =>
 
 export const startRide = async (data, params, headers) =>
   http.patch("/api/v1/rides/start-ride", data, { params, headers });
+
+export const makePayement = async (data, params, headers) =>
+  http.patch("/api/v1/rides/make-payment", data, { params, headers });
+
+export const endRide = async (data, params, headers) =>
+  http.patch("/api/v1/rides/end-ride", data, { params, headers });

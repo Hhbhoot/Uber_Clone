@@ -23,7 +23,20 @@ const captainAuth = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const decoded = jwt.verify(
+      token,
+      process.env.SECRET_KEY,
+      function (err, decoded) {
+        if (err) {
+          return res.status(401).json({
+            status: "fail",
+            message: "Unauthorized",
+          });
+        } else {
+          return decoded;
+        }
+      }
+    );
     const captain = await CaptainModel.findOne({ _id: decoded.id });
     if (!captain) {
       return res.status(401).json({

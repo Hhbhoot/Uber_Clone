@@ -15,6 +15,7 @@ import ConfirmRidePopup from "../components/ConfirmRidePopup";
 import { getUserLocation } from "../Utils/GetLocation";
 import ConfirmOtp from "../components/ConfirmOtp";
 import { useNavigate } from "react-router-dom";
+import Map from "./Map";
 
 const CaptainHome = () => {
   const navigate = useNavigate();
@@ -93,13 +94,13 @@ const CaptainHome = () => {
       gsap.to(ConfirmRidePanelRef.current, {
         transform: "translateY(0)",
         duration: 1,
-        zIndex: 1,
+        zIndex: 20,
       });
     } else {
       gsap.to(ConfirmRidePanelRef.current, {
         transform: "translateY(100%)",
         duration: 1,
-        zIndex: -1,
+        zIndex: -20,
       });
     }
   }, [ConfirmRidePanel]);
@@ -109,13 +110,13 @@ const CaptainHome = () => {
       gsap.to(confirmOTPRef.current, {
         transform: "translateY(0)",
         duration: 1,
-        zIndex: 1,
+        zIndex: 20,
       });
     } else {
       gsap.to(confirmOTPRef.current, {
         transform: "translateY(100%)",
         duration: 1,
-        zIndex: -1,
+        zIndex: -20,
       });
     }
   }, [confirmOTP]);
@@ -123,16 +124,12 @@ const CaptainHome = () => {
   useEffect(() => {
     if (!socket) return;
 
-    socket.on("connect", () => {
-      console.log("Connected to the server");
-    });
-
     setTimeout(() => {
       socket.emit("join", {
         captainId: captain._id,
         userType: "captain",
       });
-    });
+    }, 5000);
 
     // Function to send location to the backend
     const sendLocation = (position) => {
@@ -155,7 +152,7 @@ const CaptainHome = () => {
     // Watch user's location
     let watchId;
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
+      watchId = navigator.geolocation.getCurrentPosition(
         (position) => {
           sendLocation(position);
         },
@@ -168,14 +165,16 @@ const CaptainHome = () => {
       console.error("Geolocation is not supported by this browser.");
     }
 
-    socket.on("disconnect", () => {
-      console.log("Disconnected from the server");
-    });
+    const intervalId = setInterval(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation);
+      }
+    }, 5000);
 
     // Cleanup the socket listeners and geolocation watch
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
+      clearInterval(intervalId);
+
       if (watchId) {
         navigator.geolocation.clearWatch(watchId);
       }
@@ -186,32 +185,33 @@ const CaptainHome = () => {
     <div className="h-screen w-full relative overflow-hidden ">
       <img
         src="/img/driverlogo.svg"
-        className="absolute w-32 h-20"
+        className="absolute w-32 h-20 z-10 top-16"
         alt="uberlogo"
       />
 
       <div
-        className="absolute top-6 right-4 bg-white p-2  rounded-full cursor-pointer"
+        className="absolute top-16 right-4 z-10 bg-white p-2  rounded-full cursor-pointer"
         onClick={handleCaptainLogout}
       >
         <FiLogOut className="text-md " />
       </div>
 
       <div
-        className="absolute z-0 top-6 right-[40%]"
+        className="absolute  top-16 right-[40%] z-10"
         onClick={handleUpdateDriving}
       >
         <GoOnlineButton />
       </div>
-      <div className="w-full h-[65%]">
-        <img
+      <div className="w-full h-full -z-0 ">
+        <Map />
+        {/* <img
           src="/img/ubermap.png"
           alt=""
           className="w-full h-full object-cover"
-        />
+        /> */}
       </div>
 
-      <div className="w-full  bg-white p-2 rounded-t-4xl">
+      <div className="w-full absolute  bg-white p-2 z-0 bottom-0 rounded-t-4xl">
         <CaptianDetails />
       </div>
 

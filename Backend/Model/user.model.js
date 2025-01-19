@@ -78,7 +78,7 @@ userSchema.methods.generateToken = function () {
     },
     process.env.SECRET_KEY,
     {
-      expiresIn: "24h",
+      expiresIn: "30d",
     }
   );
 

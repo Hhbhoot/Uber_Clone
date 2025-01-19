@@ -2,6 +2,7 @@ import express from "express";
 import { body } from "express-validator";
 import {
   CaptainProfile,
+  CaptainRideHistory,
   LoginCaptain,
   LogoutCaptain,
   RegisterCaptain,
@@ -54,6 +55,8 @@ Router.route("/login").post(
 );
 
 Router.route("/profile").get(captainAuth, CaptainProfile);
+
+Router.route("/ride-history").get(captainAuth, CaptainRideHistory);
 
 Router.route("/update-status").patch(captainAuth, updateDrivingStatus);
 

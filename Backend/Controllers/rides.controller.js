@@ -7,6 +7,7 @@ import {
   confirmRideService,
   createRideService,
   endRideService,
+  makePaymentService,
   startRideService,
 } from "../Services/ride.services.js";
 import RidesModel from "../Model/rides.model.js";
@@ -207,6 +208,52 @@ export const StartRide = async (req, res, next) => {
 
   io.to(startNewRide.user.socketId).emit("ride-started", {
     data: startNewRide,
+  });
+};
+
+export const makePayment = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: "fail",
+      errors: errors.array(),
+    });
+  }
+  const { rideId } = req?.body;
+
+  const ride = await RidesModel.findById(rideId);
+  if (!ride) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Ride not found",
+    });
+  }
+
+  if (ride.status !== "OnGoing") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Ride is not ongoing",
+    });
+  }
+
+  const makePayment = await makePaymentService(rideId);
+
+  if (!makePayment) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Failed to make payment",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    message: "Payment made successfully",
+  });
+
+  console.log(makePayment.captain.socketId);
+
+  io.to(makePayment.captain.socketId).emit("finish-ride", {
+    data: makePayment,
   });
 };
 

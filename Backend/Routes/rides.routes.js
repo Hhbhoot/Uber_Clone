@@ -6,6 +6,7 @@ import {
   confirmRide,
   createRides,
   EndRide,
+  makePayment,
   StartRide,
 } from "../Controllers/rides.controller.js";
 
@@ -44,6 +45,14 @@ router
       body("otp").isLength({ min: 6 }).withMessage("Invalid OTP"),
     ],
     StartRide
+  );
+
+router
+  .route("/make-payment")
+  .patch(
+    userAuthMiddleware,
+    [body("rideId").isMongoId().withMessage("Invalid Ride Id")],
+    makePayment
   );
 
 router

@@ -73,6 +73,7 @@ export const startRideService = async (rideId, otp) => {
     rideId,
     {
       status: "OnGoing",
+      startTime: new Date(),
     },
     {
       new: true,
@@ -92,7 +93,7 @@ export const endRideService = async (rideId) => {
     rideId,
     {
       status: "Completed",
-      paymentStatus: "paid",
+      endTime: new Date(),
     },
     {
       new: true,
@@ -102,6 +103,25 @@ export const endRideService = async (rideId) => {
   await CaptainModel.findByIdAndUpdate(ride.captain._id, {
     drivingStatus: "available",
   });
+
+  return ride;
+};
+
+export const makePaymentService = async (rideId) => {
+  if (!rideId) {
+    throw new Error("Missing required fields");
+  }
+  const ride = await RidesModel.findById(rideId).populate("user captain");
+
+  await RidesModel.findByIdAndUpdate(
+    rideId,
+    {
+      paymentStatus: "paid",
+    },
+    {
+      new: true,
+    }
+  );
 
   return ride;
 };

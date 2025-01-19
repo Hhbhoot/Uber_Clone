@@ -1,4 +1,5 @@
 import CaptainModel from "../Model/captain.model.js";
+import RidesModel from "../Model/rides.model.js";
 import { getLatLongFromAddress } from "./map.services.js";
 
 export const RegisterCaptainService = async ({
@@ -75,6 +76,45 @@ export const findAvailableCaptainService = async (location, vehicleType) => {
     });
 
     return captains;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+export const getTodaysRidesService = async (captainId) => {
+  if (!captainId) {
+    throw new Error("Please fill in all fields");
+  }
+  try {
+    const rides = await RidesModel.find({
+      captain: captainId,
+      status: "Completed",
+
+      createdAt: {
+        $gte: new Date(new Date().setHours(0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59)),
+      },
+    });
+
+    const totlaEarning =
+      Math.round(rides?.reduce((acc, ride) => acc + ride.fare, 0)) || 0;
+
+    const totelTime = rides?.reduce((acc, ride) => acc + ride.duration, 0) || 0;
+
+    const timeInHours = totelTime / 3600 || 0;
+
+    let totalDistance =
+      rides?.reduce((acc, ride) => acc + ride.distance, 0) || 0;
+
+    let totalDistanceInKm = totalDistance / 1000 || 0;
+
+    return {
+      rides,
+      timeInHours,
+      totlaEarning,
+      totalDistanceInKm,
+    };
   } catch (err) {
     console.error(err);
     throw err;

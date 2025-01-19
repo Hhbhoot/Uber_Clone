@@ -5,6 +5,7 @@ const Map = () => {
   const containerStyle = {
     width: "100%",
     height: "100vh",
+    zindex: -10,
   };
 
   // Initial state for map center and marker position

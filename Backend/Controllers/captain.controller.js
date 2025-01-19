@@ -1,6 +1,9 @@
 import CaptainModel from "../Model/captain.model.js";
 import { validationResult } from "express-validator";
-import { RegisterCaptainService } from "../Services/captain.services.js";
+import {
+  getTodaysRidesService,
+  RegisterCaptainService,
+} from "../Services/captain.services.js";
 import BlackListedTokenModel from "../Model/blacklistedToken.model.js";
 
 export const RegisterCaptain = async (req, res, next) => {
@@ -188,5 +191,30 @@ export const LogoutCaptain = async (req, res, next) => {
     });
   } catch (err) {
     return res.status(401).json({ status: "fail", error: "Unauthorized" });
+  }
+};
+
+export const CaptainRideHistory = async (req, res, next) => {
+  try {
+    // const captain = await CaptainModel.findById(req?.captain?._id);
+
+    const { rides, totlaEarning, totalDistanceInKm, timeInHours } =
+      await getTodaysRidesService(req?.captain?._id);
+
+    return res.status(200).json({
+      status: "success",
+      message: "Captain ride history fetched successfully",
+      data: {
+        rides: rides.length,
+        totlaEarning,
+        totalDistanceInKm,
+        timeInHours,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "fail",
+      error: error?.message || "Internal Server Error",
+    });
   }
 };

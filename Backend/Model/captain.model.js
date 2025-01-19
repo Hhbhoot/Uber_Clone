@@ -121,7 +121,7 @@ captainSchema.methods.generateAuthToken = function () {
     { id: this._id, email: this.email, role: this.role },
     process.env.SECRET_KEY,
     {
-      expiresIn: "24h",
+      expiresIn: "30d",
     }
   );
 

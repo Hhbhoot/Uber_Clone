@@ -1,14 +1,32 @@
 import React from "react";
 import Map from "./Map";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaRegCreditCard, FaStop } from "react-icons/fa";
+import { makePayement } from "../apis";
+import toast from "react-hot-toast";
 
 const Riding = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { rideDetails } = location.state || {};
 
   console.log("rideDetails", rideDetails);
+
+  const handleMakePayment = async () => {
+    try {
+      const { data } = await makePayement({
+        rideId: rideDetails?._id,
+      });
+
+      if (data?.status !== "success") throw new Error(data?.message);
+
+      toast.success("Payment successful");
+      navigate("/home");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center h-screen justify-between overflow-hidden">
@@ -59,7 +77,10 @@ const Riding = () => {
             <p className="text-base font-normal ">Cash</p>
           </div>
         </div>
-        <button className="bg-green-500 text-white p-3 text-base rounded-xl mt-5 w-full">
+        <button
+          className="bg-green-500 text-white p-3 text-base rounded-xl mt-5 w-full"
+          onClick={handleMakePayment}
+        >
           Make Payment
         </button>
       </div>

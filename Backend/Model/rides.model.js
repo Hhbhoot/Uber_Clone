@@ -71,6 +71,13 @@ const ridesSchema = new mongoose.Schema(
     otp: {
       type: String,
     },
+
+    startTime: {
+      type: Date,
+    },
+    endTime: {
+      type: Date,
+    },
   },
 
   {
