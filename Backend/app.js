@@ -31,6 +31,10 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res, next) => {
+  res.send("Hello World!");
+  next();
+});
 app.use("/public/uploads", express.static(filepath));
 
 app.get("/api", (req, res, next) => {
