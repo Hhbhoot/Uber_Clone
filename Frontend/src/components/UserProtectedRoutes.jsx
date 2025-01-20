@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { userTokenCheck } from "../apis";
-import useUserAuthContext from "../context/userAuthContext";
+import useUserAuthContext from "../context/UserAuthContext";
 
 const UserProtectedRoutes = ({ children }) => {
   const { user, setUser, setIsAuth } = useUserAuthContext();

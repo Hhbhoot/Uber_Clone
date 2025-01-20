@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiLogOut } from "react-icons/fi";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 import { TbClockHour3 } from "react-icons/tb";
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { LuNotebookTabs } from "react-icons/lu";

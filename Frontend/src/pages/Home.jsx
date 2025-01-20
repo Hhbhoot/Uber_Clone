@@ -9,7 +9,7 @@ import ChooseVehiclePanel from "../components/ChooseVehiclePanel";
 import VehicleDetailsPage from "../components/VehicleDetailsPage";
 import LookingForDriver from "../components/LookingForDriver";
 import { useSocket } from "../context/SocketContext";
-import useUserAuthConext from "../context/userAuthContext";
+import useUserAuthConext from "../context/UserAuthContext";
 import { FiLogOut } from "react-icons/fi";
 import WaitingForDrivers from "../components/WaitingForDrivers";
 import DriverNotFound from "../components/DriverNotFound";

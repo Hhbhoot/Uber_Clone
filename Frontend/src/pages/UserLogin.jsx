@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { userLogin } from "../apis";
-import useUserAuthConext from "../context/userAuthContext";
+import useUserAuthConext from "../context/UserAuthContext";
 
 const UserLogin = () => {
   const navigate = useNavigate();

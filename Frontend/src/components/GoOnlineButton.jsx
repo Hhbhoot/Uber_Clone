@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 
 const GoOnlineButton = () => {
   const { captain } = useCaptainAuthContext();

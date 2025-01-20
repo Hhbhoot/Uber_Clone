@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { captainLogin } from "../apis";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 
 const CaptainLogin = () => {
   const { setIsAuth, setCaptain } = useCaptainAuthContext();

@@ -5,7 +5,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import { FaRegCreditCard, FaStop } from "react-icons/fa";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 import { endRide } from "../apis";
 import toast from "react-hot-toast";
 

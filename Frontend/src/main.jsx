@@ -4,8 +4,8 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter as Router } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { UserAuthConextProvider } from "./context/userAuthContext.jsx";
-import { CaptainAuthConextProvider } from "./context/captainAuthContext.jsx";
+import { UserAuthConextProvider } from "./context/UserAuthContext.jsx";
+import { CaptainAuthConextProvider } from "./context/CaptainAuthContext.jsx";
 import { SocketProvider } from "./context/SocketContext.jsx";
 
 createRoot(document.getElementById("root")).render(

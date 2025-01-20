@@ -14,8 +14,8 @@ import {
 } from "./pages";
 import UserProtectedRoutes from "./components/UserProtectedRoutes";
 import CaptainProtectedRoutes from "./components/CaptainProtectedRoutes";
-import useUserAuthConext from "./context/userAuthContext";
-import useCaptainAuthContext from "./context/captainAuthContext";
+import useUserAuthConext from "./context/UserAuthContext";
+import useCaptainAuthContext from "./context/CaptainAuthContext";
 
 function App() {
   const { setUser } = useUserAuthConext();

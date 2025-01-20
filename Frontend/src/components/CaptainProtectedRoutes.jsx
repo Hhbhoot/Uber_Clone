@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { captainTokenCheck } from "../apis";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 
 const CaptainProtectedRoutes = ({ children }) => {
   const { setCaptain } = useCaptainAuthContext();

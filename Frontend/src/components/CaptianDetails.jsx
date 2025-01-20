@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IoSpeedometerOutline } from "react-icons/io5";
 import { LuNotebookTabs } from "react-icons/lu";
 import { TbClockHour3 } from "react-icons/tb";
-import useCaptainAuthContext from "../context/captainAuthContext";
+import useCaptainAuthContext from "../context/CaptainAuthContext";
 import { captainRideHistory } from "../apis";
 
 const CaptianDetails = () => {
