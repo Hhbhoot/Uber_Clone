@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import useCaptainAuthContext from "../context/CaptainAuthContext";
-import { TbClockHour3 } from "react-icons/tb";
-import { IoSpeedometerOutline } from "react-icons/io5";
-import { LuNotebookTabs } from "react-icons/lu";
 import GoOnlineButton from "../components/GoOnlineButton";
 import { confirmRide, startRide, updateDrivingStatus } from "../apis";
 import CaptianDetails from "../components/CaptianDetails";
@@ -12,7 +9,6 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import ConfirmRidePopup from "../components/ConfirmRidePopup";
-import { getUserLocation } from "../Utils/GetLocation";
 import ConfirmOtp from "../components/ConfirmOtp";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
@@ -144,7 +140,7 @@ const CaptainHome = () => {
     };
 
     socket.on("new-ride", (data) => {
-      console.log(data);
+      // console.log(data);
       setRideDetails(data);
       setOpenRideDetails(true);
     });

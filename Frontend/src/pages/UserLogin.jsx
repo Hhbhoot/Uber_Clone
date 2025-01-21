@@ -33,7 +33,7 @@ const UserLogin = () => {
     setLoading(true);
     try {
       const { data } = await userLogin({ email, password });
-      console.log(data);
+      // console.log(data);
       if (data?.status !== "success") {
         toast.error("Invalid email or password");
       }

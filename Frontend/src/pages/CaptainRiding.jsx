@@ -16,9 +16,9 @@ const CaptainRiding = () => {
   const location = useLocation();
   const { rideDetails } = location.state || {};
 
-  console.log(captain.socketId);
+  // console.log(captain.socketId);
 
-  console.log("rideDetails", rideDetails);
+  // console.log("rideDetails", rideDetails);
 
   const [finishRide, setFinishRide] = useState(false);
   const finishRideRef = useRef(null);
@@ -27,7 +27,7 @@ const CaptainRiding = () => {
     if (!socket) return;
 
     socket.on("finish-ride", (data) => {
-      console.log("finish-ride", data);
+      // console.log("finish-ride", data);
       setFinishRide(true);
     });
   }, [socket]);

@@ -11,7 +11,7 @@ const Riding = () => {
   const location = useLocation();
   const { rideDetails } = location.state || {};
 
-  console.log("rideDetails", rideDetails);
+  // console.log("rideDetails", rideDetails);
 
   const handleMakePayment = async () => {
     try {
